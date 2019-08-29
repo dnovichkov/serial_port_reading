@@ -1,7 +1,10 @@
 import configparser
+import datetime
+
 import serial
-import serial.tools.list_ports
 from loguru import logger
+
+from data_parser import DataParser
 
 
 def main():
@@ -14,22 +17,25 @@ def main():
     logger.debug("We've run reading from serial port")
     logger.debug('SERIAL_RATE is {}', serial_port)
     logger.debug('SERIAL_PORT is {}', serial_rate)
-    # logger.debug(serial.tools.list_ports.ListPortInfo)
 
     ser = serial.Serial(serial_port, serial_rate)
+    data_parser = DataParser()
 
     while True:
         try:
-            # using ser.readline() assumes each line contains a single reading
-            # sent using Serial.println() on the Arduino
             reading = ser.readline().decode('utf-8')
-            # reading is a string...do whatever you want from here
             logger.debug(reading)
-            # with open("test_data.csv", "a") as f:
-            #     writer = csv.writer(f, delimiter=",")
-            #     writer.writerow([time.time(), decoded_bytes])
+            data_parser.parse(reading)
         except KeyboardInterrupt:
             print("Keyboard Interrupt")
+            json_file_name = (
+                    "test_data"
+                    + str(serial_port)
+                    + "_"
+                    + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                    + "_result.json"
+            )
+            data_parser.save_results(json_file_name)
             break
 
 
