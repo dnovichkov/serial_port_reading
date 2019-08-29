@@ -1,0 +1,41 @@
+These project works with Python3.
+
+It's recommended to setup virtual environment. Here are some links:
+[https://docs.python.org/3/library/venv.html](https://docs.python.org/3/library/venv.html) and 
+[https://virtualenv.pypa.io/en/stable/userguide/](https://docs.python.org/3/library/venv.html)
+
+Example for Windows:
+
+```
+python -m venv env
+cd env/Scripts
+activate.bat
+```
+
+Then return to source directory and install necessary modules:
+
+```
+cd ../../
+pip install -r requirements.txt
+```
+
+Congratulations, now it is possible to run script:
+```
+python main.py
+```
+
+It is possible to change some port settings using settings.conf:
+ ```
+[DATA]
+# This port address is for the serial tx/rx pins on the GPIO header
+#SERIAL_PORT = /dev/ttyAMA0
+SERIAL_PORT = COM1
+# Be sure to set this to the same rate used on the Arduino
+SERIAL_RATE = 9600
+```
+
+If you want to get all ports in your system you can do it by command:
+ ```
+python -m serial.tools.list_ports -v
+ ```
+ 

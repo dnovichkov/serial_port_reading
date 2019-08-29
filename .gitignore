@@ -1,0 +1,11 @@
+.idea
+*.pyc
+*.sqlite3
+*.sqlite
+
+env/*
+venv/*
+.env*
+build/*
+dist/*
+*.log
