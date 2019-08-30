@@ -5,6 +5,7 @@ import serial
 from loguru import logger
 
 from data_parser import DataParser
+from plot_painter import PlotPainter
 
 
 def main():
@@ -36,6 +37,9 @@ def main():
                     + "_result.json"
             )
             data_parser.save_results(json_file_name)
+            painter = PlotPainter()
+            painter.paint(data_parser.get_results())
+
             break
 
 

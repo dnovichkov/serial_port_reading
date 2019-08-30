@@ -1,5 +1,5 @@
 import unittest
-import json
+
 import os
 import filecmp
 from data_parser import DataParser
