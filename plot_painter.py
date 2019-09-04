@@ -7,6 +7,11 @@ import plotly.graph_objects as go
 class PlotPainter:
     @staticmethod
     def paint(plot_data):
+        """
+        Paint the plot and save it to html-file with name 'plot_CURRENT_TIME.html'.
+        :param plot_data:
+        :return:
+        """
         if not isinstance(plot_data, dict):
             logger.error('Wrong plot data format')
             return
