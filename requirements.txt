@@ -1,3 +1,4 @@
 pyserial
 loguru
 plotly
+pyqt5
