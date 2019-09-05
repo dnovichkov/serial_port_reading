@@ -2,3 +2,5 @@ pyserial
 loguru
 plotly
 pyqt5
+matplotlib
+np
