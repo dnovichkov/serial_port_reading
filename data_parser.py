@@ -11,8 +11,8 @@ class DataParser:
         """
         Parse data from Arduino.
         Parsed data saves
-        :param arduino_string: Format: 'Temperarure1=56'.
-        :return:
+        :param arduino_string: Format: 'Temperature1=56'.
+        :return: None if arduino_string and (Sensor_number, value) if everything is correct.
         """
         try:
             data = arduino_string.split('=')
