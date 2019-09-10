@@ -5,6 +5,12 @@ import plotly.graph_objects as go
 
 
 class PlotPainter:
+    def __init__(self):
+        self.lines = []
+
+    def add_data(self, data):
+        pass
+
     @staticmethod
     def paint(plot_data):
         """
