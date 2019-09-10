@@ -5,6 +5,7 @@ import sys
 import matplotlib
 import serial
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QInputDialog
 from loguru import logger
 
 from data_parser import DataParser
@@ -12,6 +13,14 @@ from plot_canvas import MyDynamicMplCanvas
 from plot_painter import PlotPainter
 
 matplotlib.use("Qt5Agg")
+
+
+def show_dialog():
+    text, ok = QInputDialog.getText(None, 'Port settings',
+                                    'Enter port')
+
+    if ok:
+        print(str(text))
 
 
 def main():
@@ -54,6 +63,8 @@ def main_ui():
 
     scene = QtWidgets.QGraphicsScene()
     win.plot_graphics_view.setScene(scene)
+
+    win.actionPorts_settings.triggered.connect(show_dialog)
 
     dc = MyDynamicMplCanvas()
     scene.addWidget(dc)

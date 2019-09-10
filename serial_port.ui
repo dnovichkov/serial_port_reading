@@ -429,10 +429,21 @@
     <property name="title">
      <string>Ports</string>
     </property>
+    <addaction name="actionPorts_settings"/>
    </widget>
    <addaction name="menuPorts"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionPorts_settings">
+   <property name="text">
+    <string>Port settings</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
