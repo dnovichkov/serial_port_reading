@@ -66,8 +66,9 @@ def main_ui():
 
     win.actionPorts_settings.triggered.connect(show_dialog)
 
-    dc = MyDynamicMplCanvas()
-    scene.addWidget(dc)
+    figure_canvas = MyDynamicMplCanvas()
+    scene.addWidget(figure_canvas)
+    win.record_button.clicked.connect(figure_canvas.start)
 
     app.exec_()
 
