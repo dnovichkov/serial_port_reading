@@ -2,15 +2,16 @@ import configparser
 import datetime
 import sys
 
-import matplotlib.pylab as plt
-import numpy as np
+import matplotlib
 import serial
 from PyQt5 import QtWidgets, uic
 from loguru import logger
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from data_parser import DataParser
+from plot_canvas import MyDynamicMplCanvas
 from plot_painter import PlotPainter
+
+matplotlib.use("Qt5Agg")
 
 
 def main():
@@ -48,24 +49,14 @@ def main():
 
 def main_ui():
     app = QtWidgets.QApplication(sys.argv)
-    win = uic.loadUi("serial_port.ui")  # specify the location of your .ui file
+    win = uic.loadUi("serial_port.ui")
     win.show()
 
     scene = QtWidgets.QGraphicsScene()
     win.plot_graphics_view.setScene(scene)
 
-    fig, ax1 = plt.subplots()
-    plot_widget = FigureCanvas(fig)
-    x = np.linspace(0, 10 * np.pi, 100)
-    y = np.sin(x)
-
-    line1, = ax1.plot(x, y, 'b-')
-
-    for phase in np.linspace(0, 10 * np.pi, 100):
-        line1.set_ydata(np.sin(0.5 * x + phase))
-    fig.canvas.draw()
-
-    scene.addWidget(plot_widget)
+    dc = MyDynamicMplCanvas()
+    scene.addWidget(dc)
 
     app.exec_()
 
