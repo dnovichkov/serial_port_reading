@@ -2,9 +2,11 @@ import configparser
 import datetime
 import sys
 
+import numpy
+
 import matplotlib
 import serial
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QInputDialog
 from loguru import logger
 
@@ -69,6 +71,18 @@ def main_ui():
     figure_canvas = MyDynamicMplCanvas()
     scene.addWidget(figure_canvas)
     win.record_button.clicked.connect(figure_canvas.start)
+
+    # Fixme: ugly design.
+    sensor_data_table_model = QtGui.QStandardItemModel(parent=app)
+    sensor_count = 8
+    headers = ['Sensor ' + str(i) for i in range(0, sensor_count)]
+    row = [QtGui.QStandardItem(50 + i) for i in range(0, sensor_count)]
+
+    sensor_data_table_model .setHorizontalHeaderLabels(headers)
+    sensor_data_table_model .appendRow(row)
+
+    win.probe_data_table.setModel(sensor_data_table_model )
+    win.probe_data_table.show()
 
     app.exec_()
 
