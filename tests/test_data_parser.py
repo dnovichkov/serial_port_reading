@@ -9,11 +9,11 @@ class TestDataParser(unittest.TestCase):
     def test_good_data(self):
         data_lines = \
             [
-                'Sensor 1 = 56 degrees',
-                'Sensor 2 = 54 degrees ',
-                'Sensor 3 = 53 degrees',
-                'Sensor 3 = 52 degrees',
-                'Sensor 1 = 666 degrees',
+                'Temperature1=56',
+                'Temperature2=54 ',
+                'Temperature3=53',
+                'Temperature3=52',
+                'Temperature1=666',
             ]
         expected_result = \
             {
@@ -42,15 +42,15 @@ class TestDataParser(unittest.TestCase):
     def test_bad_data(self):
         data_lines = \
             [
-                'Sensor 1: 56 degrees',
-                'Sensor 2 = 54 degrees ',
-                'Sensor 3 = 53 degrees',
-                'Sensor 3 = 52 degrees',
-                'Sensor 1 = 666 degrees',
-                'Sensor 1',
+                'Temperature1: 56',
+                'Temperature2=54 ',
+                'Temperature3=53',
+                'Temperature3=52',
+                'Temperature1=666',
+                'Temperature1',
                 'Error',
-                'Sensor 1 = 666degrees',
-                'Sensor 4 = No data',
+                'Temperature1=666degrees',
+                'Temperature4=No data',
             ]
         expected_result = \
             {
@@ -77,19 +77,19 @@ class TestDataParser(unittest.TestCase):
     def test_saving(self):
         data_lines = \
             [
-                'Sensor 1: 56 degrees',
-                'Sensor 2 = 54 degrees ',
-                'Sensor 3 = 53 degrees',
-                'Sensor 3 = 52 degrees',
-                'Sensor 1 = 666 degrees',
-                'Sensor 1',
+                'Temperature1: 56',
+                'Temperature2=54 ',
+                'Temperature3=53',
+                'Temperature3=52',
+                'Temperature1=666',
+                'Temperature1',
                 'Error',
-                'Sensor 1 = 666degrees',
-                'Sensor 4 = No data',
-                'Sensor 1 = 54 degrees',
-                'Sensor 1 = 55 degrees',
-                'Sensor 4 = 40 degrees',
-                'Sensor 3 = 55 degrees',
+                'Temperature1=666degrees',
+                'Temperature4=No data',
+                'Temperature1=54',
+                'Temperature1=55',
+                'Temperature4=40',
+                'Temperature3=55',
             ]
         parser = DataParser()
         for line in data_lines:
