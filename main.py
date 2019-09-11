@@ -2,10 +2,9 @@ import configparser
 import datetime
 import sys
 
-import numpy
-
 import matplotlib
 import serial
+import serial.tools.list_ports
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QInputDialog
 from loguru import logger
@@ -18,8 +17,11 @@ matplotlib.use("Qt5Agg")
 
 
 def show_dialog():
+    devices = [port.device for port in serial.tools.list_ports.comports()]
     text, ok = QInputDialog.getText(None, 'Port settings',
-                                    'Enter port')
+                                    'Enter port. Possible values: {0}'.format(devices))
+    # TODO: Rework text to spinbox
+    # TODO: Save value to config-file
 
     if ok:
         print(str(text))
