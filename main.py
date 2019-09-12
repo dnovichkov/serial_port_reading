@@ -13,18 +13,34 @@ from data_parser import DataParser
 from plot_canvas import MyDynamicMplCanvas
 from plot_painter import PlotPainter
 
+from serial_port import Ui_MainWindow
+
+CONFIG_FILENAME = 'settings.conf'
+
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+
 matplotlib.use("Qt5Agg")
 
 
 def show_dialog():
     devices = [port.device for port in serial.tools.list_ports.comports()]
-    text, ok = QInputDialog.getText(None, 'Port settings',
-                                    'Enter port. Possible values: {0}'.format(devices))
-    # TODO: Rework text to spinbox
-    # TODO: Save value to config-file
+    # text, ok = QInputDialog.getText(None, 'Port settings',
+    #                                 'Enter port. Possible values: {0}'.format(devices))
 
-    if ok:
-        print(str(text))
+    text, ok = QInputDialog.getItem(None, "Port setting", "Choose port:", devices, 0, False)
+
+    if ok and text:
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILENAME)
+        config.set("DATA", "SERIAL_PORT", str(text))
+        with open(CONFIG_FILENAME, "w") as config_file:
+            config.write(config_file)
 
 
 def main():
@@ -62,17 +78,17 @@ def main():
 
 def main_ui():
     app = QtWidgets.QApplication(sys.argv)
-    win = uic.loadUi("serial_port.ui")
+    win = MainWindow()
     win.show()
 
     scene = QtWidgets.QGraphicsScene()
-    win.plot_graphics_view.setScene(scene)
+    win.ui.plot_graphics_view.setScene(scene)
 
-    win.actionPorts_settings.triggered.connect(show_dialog)
+    win.ui.actionPorts_settings.triggered.connect(show_dialog)
 
     figure_canvas = MyDynamicMplCanvas()
     scene.addWidget(figure_canvas)
-    win.record_button.clicked.connect(figure_canvas.start)
+    win.ui.record_button.clicked.connect(figure_canvas.start)
 
     # Fixme: ugly design.
     sensor_data_table_model = QtGui.QStandardItemModel(parent=app)
@@ -83,8 +99,8 @@ def main_ui():
     sensor_data_table_model .setHorizontalHeaderLabels(headers)
     sensor_data_table_model .appendRow(row)
 
-    win.probe_data_table.setModel(sensor_data_table_model )
-    win.probe_data_table.show()
+    win.ui.probe_data_table.setModel(sensor_data_table_model )
+    win.ui.probe_data_table.show()
 
     app.exec_()
 
