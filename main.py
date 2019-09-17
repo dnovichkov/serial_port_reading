@@ -5,14 +5,15 @@ import sys
 import matplotlib
 import serial
 import serial.tools.list_ports
-from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QInputDialog
 from loguru import logger
+from serial import SerialException
 
 from data_parser import DataParser
+from data_session import DataSession
 from plot_canvas import MyDynamicMplCanvas
 from plot_painter import PlotPainter
-
 from serial_port import Ui_MainWindow
 
 CONFIG_FILENAME = 'settings.conf'
@@ -21,6 +22,7 @@ CONFIG_FILENAME = 'settings.conf'
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.is_played = False
+        self.data_session = None
         self.figure_canvas = MyDynamicMplCanvas()
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
@@ -52,10 +54,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.record_button.setText("Play")
             self.is_played = False
             self.figure_canvas.stop()
+            self.data_session.stop()
+            self.data_session = None
         else:
             self.ui.record_button.setText("Stop")
             self.is_played = True
             self.figure_canvas.start()
+            self.data_session = DataSession(self, get_config_settings())
+            try:
+                self.data_session.run()
+            except SerialException as e:
+                logger.error(f'Ошибка при чтении данных: {e}')
+
+    def add_data(self, sensor_data):
+        pass
 
     def show_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
@@ -70,11 +82,22 @@ class MainWindow(QtWidgets.QMainWindow):
         text, ok = QInputDialog.getItem(None, "Port setting", "Choose port:", devices, 0, False)
 
         if ok and text:
+            logger.debug(f'Selected port is {str(text)}')
             config.set("DATA", "SERIAL_PORT", str(text))
             with open(CONFIG_FILENAME, "w") as config_file:
                 config.write(config_file)
 
+
 matplotlib.use("Qt5Agg")
+
+
+def get_config_settings():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILENAME)
+    serial_port = config['DATA']['SERIAL_PORT']
+    serial_rate = config['DATA']['SERIAL_RATE']
+    port_settings = {'SERIAL_PORT': serial_port, 'SERIAL_RATE': serial_rate}
+    return port_settings
 
 
 def main():
