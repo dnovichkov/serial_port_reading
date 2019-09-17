@@ -39,6 +39,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def start(self):
         self.timer.start(1000)
 
+    def stop(self):
+        self.timer.stop()
+
     def compute_initial_figure(self):
         self.axes.plot([0, 1, 2, 3], [1, 2, 0, 4], 'r')
 

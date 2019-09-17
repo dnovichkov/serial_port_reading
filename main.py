@@ -20,27 +20,61 @@ CONFIG_FILENAME = 'settings.conf'
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
+        self.is_played = False
+        self.figure_canvas = MyDynamicMplCanvas()
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        scene = QtWidgets.QGraphicsScene()
+        self.ui.plot_graphics_view.setScene(scene)
 
-matplotlib.use("Qt5Agg")
+        self.ui.actionPorts_settings.triggered.connect(self.show_dialog)
 
+        scene.addWidget(self.figure_canvas)
+        self.ui.record_button.clicked.connect(self.play_button_clicked)
 
-def show_dialog():
-    devices = [port.device for port in serial.tools.list_ports.comports()]
-    # text, ok = QInputDialog.getText(None, 'Port settings',
-    #                                 'Enter port. Possible values: {0}'.format(devices))
+        sensor_data_table_model = QtGui.QStandardItemModel(parent=None)
+        sensor_count = 8
+        headers = ['Sensor ' + str(i) for i in range(0, sensor_count)]
+        row = [QtGui.QStandardItem(50 + i) for i in range(0, sensor_count)]
 
-    text, ok = QInputDialog.getItem(None, "Port setting", "Choose port:", devices, 0, False)
+        sensor_data_table_model.setHorizontalHeaderLabels(headers)
+        sensor_data_table_model.appendRow(row)
 
-    if ok and text:
+        self.ui.probe_data_table.setModel(sensor_data_table_model)
+        self.ui.probe_data_table.show()
+
+    def play_button_clicked(self):
+        sender = self.sender()
+        self.statusBar().showMessage(sender.text() + ' was pressed')
+        if self.is_played:
+            self.ui.record_button.setText("Play")
+            self.is_played = False
+            self.figure_canvas.stop()
+        else:
+            self.ui.record_button.setText("Stop")
+            self.is_played = True
+            self.figure_canvas.start()
+
+    def show_dialog(self):
+        devices = [port.device for port in serial.tools.list_ports.comports()]
         config = configparser.ConfigParser()
         config.read(CONFIG_FILENAME)
-        config.set("DATA", "SERIAL_PORT", str(text))
-        with open(CONFIG_FILENAME, "w") as config_file:
-            config.write(config_file)
+        serial_port = config['DATA']['SERIAL_PORT']
+        if not devices:
+            devices.append(serial_port)
+            message_string = f'Warning: no ports in system, use value from config: {serial_port}'
+            self.statusBar().showMessage(message_string)
+
+        text, ok = QInputDialog.getItem(None, "Port setting", "Choose port:", devices, 0, False)
+
+        if ok and text:
+            config.set("DATA", "SERIAL_PORT", str(text))
+            with open(CONFIG_FILENAME, "w") as config_file:
+                config.write(config_file)
+
+matplotlib.use("Qt5Agg")
 
 
 def main():
@@ -80,27 +114,6 @@ def main_ui():
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.show()
-
-    scene = QtWidgets.QGraphicsScene()
-    win.ui.plot_graphics_view.setScene(scene)
-
-    win.ui.actionPorts_settings.triggered.connect(show_dialog)
-
-    figure_canvas = MyDynamicMplCanvas()
-    scene.addWidget(figure_canvas)
-    win.ui.record_button.clicked.connect(figure_canvas.start)
-
-    # Fixme: ugly design.
-    sensor_data_table_model = QtGui.QStandardItemModel(parent=app)
-    sensor_count = 8
-    headers = ['Sensor ' + str(i) for i in range(0, sensor_count)]
-    row = [QtGui.QStandardItem(50 + i) for i in range(0, sensor_count)]
-
-    sensor_data_table_model .setHorizontalHeaderLabels(headers)
-    sensor_data_table_model .appendRow(row)
-
-    win.ui.probe_data_table.setModel(sensor_data_table_model )
-    win.ui.probe_data_table.show()
 
     app.exec_()
 
