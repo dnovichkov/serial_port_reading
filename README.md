@@ -53,8 +53,16 @@ Some code for debug purposes:
 ```
 import serial
 ser = serial.Serial('COM2')
-ser.write(b'\n')
 ser.write(b'Temperature1=56\nTemperature2=54\n')
-ser.write(b'Temperature3=56\nTemperature5=54\n')
+ser.write(b'Temperature1=55\nTemperature2=56\n')
+ser.write(b'Temperature1=51\nTemperature2=55\n')
+ser.write(b'Temperature2=58\nTemperature1=60\n')
 ser.close()   
+```
+
+If you want to create executable file:
+```
+pip install pyinstaller
+pyinstaller --onefile --noconsole main.py
+OR pyinstaller --noconsole main.py
 ```

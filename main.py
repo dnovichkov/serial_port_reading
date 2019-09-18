@@ -35,15 +35,15 @@ class MainWindow(QtWidgets.QMainWindow):
         scene.addWidget(self.figure_canvas)
         self.ui.record_button.clicked.connect(self.play_button_clicked)
 
-        sensor_data_table_model = QtGui.QStandardItemModel(parent=None)
+        self.sensor_data_table_model = QtGui.QStandardItemModel(parent=None)
         sensor_count = 8
         headers = ['Sensor ' + str(i) for i in range(0, sensor_count)]
         row = [QtGui.QStandardItem(50 + i) for i in range(0, sensor_count)]
 
-        sensor_data_table_model.setHorizontalHeaderLabels(headers)
-        sensor_data_table_model.appendRow(row)
+        self.sensor_data_table_model.setHorizontalHeaderLabels(headers)
+        self.sensor_data_table_model.appendRow(row)
 
-        self.ui.probe_data_table.setModel(sensor_data_table_model)
+        self.ui.probe_data_table.setModel(self.sensor_data_table_model)
         self.ui.probe_data_table.show()
 
     def play_button_clicked(self):
@@ -52,13 +52,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.is_played:
             self.ui.record_button.setText("Play")
             self.is_played = False
-            self.figure_canvas.stop()
             self.data_session.stop()
             self.data_session = None
         else:
             self.ui.record_button.setText("Stop")
+            self.figure_canvas.run()
             self.is_played = True
-            self.figure_canvas.start()
             self.data_session = DataSession(self, get_config_settings())
             try:
 
@@ -68,6 +67,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_data(self, sensor_data):
         self.statusBar().showMessage(str(sensor_data))
+        self.figure_canvas.add_point(sensor_data)
+        sensor_number = sensor_data[0]
+        if sensor_number:
+            self.sensor_data_table_model.setData(self.sensor_data_table_model.index(0, sensor_number - 1),
+                                                 sensor_data[1])
 
     def show_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
