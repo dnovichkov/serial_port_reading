@@ -1,4 +1,5 @@
 import time
+import copy
 
 import serial
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
@@ -27,27 +28,26 @@ class SerialWorker(QObject):
 
     @pyqtSlot()
     def run(self):
-        logger.debug(f'Run {self.is_started}')
-        while True and self.is_started:
-            logger.debug(f'Run in cycle {self.is_started}')
+        while self.is_started:
             time.sleep(1)
-            reading = self.serial_device.readline().decode('utf-8')
-            logger.debug(reading)
-            self.read_data_signal.emit(reading)
+            line = self.serial_device.readline().decode('utf-8')
+            logger.debug(line)
+            data_copy = copy.deepcopy(line)
+            self.read_data_signal.emit(data_copy)
 
-    @pyqtSlot()
+        logger.debug("We finished reading")
+
     def stop(self):
-        logger.debug('SerialWorker stop')
         self.is_started = False
         self.serial_device.close()
 
 
 class DataSession(QObject):
     signal_start_background_job = pyqtSignal()
-    signal_stop_background_job = pyqtSignal()
 
     def __init__(self, plot_painter, port_settings=DEFAULT_PORT_SETTINGS):
         super().__init__()
+
         self.data_parser = DataParser()
         self.plot_painter = plot_painter
 
@@ -55,23 +55,17 @@ class DataSession(QObject):
         self.thread = QThread()
         self.worker.moveToThread(self.thread)
         self.worker.read_data_signal.connect(self.add_data)
-
         self.signal_start_background_job.connect(self.worker.run)
-        self.signal_stop_background_job.connect(self.worker.stop)
 
-    def start_background_job(self):
+    def run(self):
         self.thread.start()
         self.signal_start_background_job.emit()
 
-    def run(self):
-        self.start_background_job()
-
-    @pyqtSlot()
-    def add_data(self, sensor_data: str):
-        logger.debug(sensor_data)
-        sensor_data = self.data_parser.parse(sensor_data)
-        if sensor_data:
-            self.plot_painter.add_data(sensor_data)
+    def add_data(self, sensor_data):
+        logger.debug(f"Data was read: {sensor_data}")
+        parser_data = self.data_parser.parse(sensor_data)
+        if parser_data:
+            self.plot_painter.add_data(parser_data)
             # TODO: save to DB
 
     def stop(self):

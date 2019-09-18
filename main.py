@@ -13,7 +13,6 @@ from serial import SerialException
 from data_parser import DataParser
 from data_session import DataSession
 from plot_canvas import MyDynamicMplCanvas
-from plot_painter import PlotPainter
 from serial_port import Ui_MainWindow
 
 CONFIG_FILENAME = 'settings.conf'
@@ -62,12 +61,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.figure_canvas.start()
             self.data_session = DataSession(self, get_config_settings())
             try:
+
                 self.data_session.run()
             except SerialException as e:
-                logger.error(f'Ошибка при чтении данных: {e}')
+                logger.error(f'Error while reading data: {e}')
 
     def add_data(self, sensor_data):
-        pass
+        self.statusBar().showMessage(str(sensor_data))
 
     def show_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
@@ -129,12 +129,12 @@ def main():
                     + "_result.json"
             )
             data_parser.save_results(json_file_name)
-            painter = PlotPainter()
-            painter.paint(data_parser.get_results())
 
 
 def main_ui():
     app = QtWidgets.QApplication(sys.argv)
+
+    logger.add("file_{time}.log")
     win = MainWindow()
     win.show()
 
