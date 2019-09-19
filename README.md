@@ -63,6 +63,5 @@ ser.close()
 If you want to create executable file:
 ```
 pip install pyinstaller
-pyinstaller --onefile --noconsole main.py
-OR pyinstaller --noconsole main.py
+pyinstaller main.cpec
 ```
