@@ -218,6 +218,8 @@ def main_ui():
 
     logger.add("Serial_port_reading.log", rotation="500 MB")
     logger.debug('Application was started')
+    devices = [port.device for port in serial.tools.list_ports.comports()]
+    logger.debug(f'Possible ports are: {devices}')
     win = MainWindow()
     win.show()
 
