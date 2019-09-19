@@ -11,8 +11,8 @@ class DataParser:
         """
         Parse data from Arduino.
         Parsed data saves
-        :param arduino_string: Format: 'Temperarure1=56'.
-        :return:
+        :param arduino_string: Format: 'Temperature1=56'.
+        :return: None if arduino_string and (Sensor_number, value) if everything is correct.
         """
         try:
             data = arduino_string.split('=')
@@ -22,10 +22,12 @@ class DataParser:
             if sensor_number not in self.parsing_results:
                 self.parsing_results[sensor_number] = []
             self.parsing_results[sensor_number].append(value)
+            return sensor_number, value
         except ValueError:
             logger.exception("ValueError for string {}", arduino_string)
         except IndexError:
             logger.exception("IndexError for string {}", arduino_string)
+        return None
 
     def get_results(self):
         """
