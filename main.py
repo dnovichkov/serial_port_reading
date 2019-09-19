@@ -61,7 +61,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.probe_data_table.show()
 
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
-        self.ui.measurements_list_widget.itemClicked.connect(self.listwidgetclicked)
+        self.ui.measurements_list_widget.itemClicked.connect(self.record_clicked)
+        self.ui.delete_btn.clicked.connect(self.delete_record_clicked)
 
     def play_button_clicked(self):
         sender = self.sender()
@@ -99,7 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(0, sensor_number - 1),
                                                  sensor_data[1])
 
-    def listwidgetclicked(self, item):
+    def record_clicked(self, item):
         filename = 'data_' + item.text() + '.json'
         json_data = {}
         with open(filename, encoding='utf-8') as f:
@@ -107,7 +108,6 @@ class MainWindow(QtWidgets.QMainWindow):
             json_data = json.loads(data)
         if not json_data:
             logger.warning(f'File {filename} is empty')
-            return
 
         figure_canvas = MyDynamicMplCanvas()
         figure_canvas.line_data = json_data
@@ -134,6 +134,17 @@ class MainWindow(QtWidgets.QMainWindow):
             config.set("DATA", "SERIAL_PORT", str(text))
             with open(CONFIG_FILENAME, "w") as config_file:
                 config.write(config_file)
+
+    def delete_record_clicked(self):
+        list_items = self.ui.measurements_list_widget.selectedItems()
+        if not list_items:
+            return
+        for item in list_items:
+            text = item.text()
+            self.ui.measurements_list_widget.takeItem(self.ui.measurements_list_widget.row(item))
+            filename = 'data_' + text + '.json'
+            logger.debug(f'We are going to delete {filename}')
+            os.remove(filename)
 
 
 matplotlib.use("Qt5Agg")
@@ -182,7 +193,7 @@ def main():
 def main_ui():
     app = QtWidgets.QApplication(sys.argv)
 
-    logger.add("file_{time}.log")
+    logger.add("Serial_port_reading.log", rotation="500 MB")
     win = MainWindow()
     win.show()
 

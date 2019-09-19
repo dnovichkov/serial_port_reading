@@ -223,7 +223,7 @@ class Ui_MainWindow(object):
         self.archive_time_label.setText(_translate("MainWindow", "Time of measurement"))
         self.print_btn.setText(_translate("MainWindow", "Print"))
         self.save_btn.setText(_translate("MainWindow", "Save as PDF"))
-        self.delete_btn.setText(_translate("MainWindow", "Delete file"))
+        self.delete_btn.setText(_translate("MainWindow", "Delete record"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.archive_tab), _translate("MainWindow", "Archive"))
         self.menuPorts.setTitle(_translate("MainWindow", "Ports"))
         self.actionPorts_settings.setText(_translate("MainWindow", "Port settings"))

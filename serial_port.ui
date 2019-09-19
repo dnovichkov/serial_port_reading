@@ -427,7 +427,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Delete file</string>
+             <string>Delete record</string>
             </property>
            </widget>
           </item>

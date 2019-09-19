@@ -70,7 +70,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.axes.clear()
         max_point_count = 0
         for id_, points in self.line_data.items():
-            color = PLOT_COLORS.get(id_, DEFAULT_COLOR)
+            color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
             plot_count = len(points)
             max_point_count = max(max_point_count, plot_count)
             name = f'Temp_{id_}'
