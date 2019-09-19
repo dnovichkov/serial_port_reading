@@ -1,6 +1,9 @@
 import configparser
 import datetime
 import sys
+import os
+
+import json
 
 import matplotlib
 import serial
@@ -18,6 +21,16 @@ from serial_port import Ui_MainWindow
 CONFIG_FILENAME = 'settings.conf'
 
 
+def get_plots_data():
+    result = {}
+    file_folder = os.getcwd()
+    for file in os.listdir(file_folder):
+        if file.endswith(".json") and file.startswith("data_"):
+            plot_dt = file[5:-5]
+            result[plot_dt] = file
+    return result
+
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.is_played = False
@@ -26,6 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.main_plot_tab.set
 
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view.setScene(scene)
@@ -46,6 +60,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.probe_data_table.setModel(self.sensor_data_table_model)
         self.ui.probe_data_table.show()
 
+        self.ui.measurements_list_widget.addItems(get_plots_data().keys())
+        self.ui.measurements_list_widget.itemClicked.connect(self.listwidgetclicked)
+
     def play_button_clicked(self):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
@@ -60,6 +77,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     + ".pdf"
             )
             self.figure_canvas.save_plot(pdf_image_filename)
+            self.ui.measurements_list_widget.clear()
+            self.ui.measurements_list_widget.addItems(get_plots_data().keys())
 
         else:
             self.ui.record_button.setText("Stop")
@@ -79,6 +98,25 @@ class MainWindow(QtWidgets.QMainWindow):
         if sensor_number:
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(0, sensor_number - 1),
                                                  sensor_data[1])
+
+    def listwidgetclicked(self, item):
+        print('!!! click {}'.format(item.text()))
+        filename = 'data_' + item.text() + '.json'
+        json_data = {}
+        with open(filename, encoding='utf-8') as f:
+            data = f.read()
+            json_data = json.loads(data)
+        if not json_data:
+            logger.warning(f'File {filename} is empty')
+            return
+
+        figure_canvas = MyDynamicMplCanvas()
+        figure_canvas.line_data = json_data
+        scene = QtWidgets.QGraphicsScene()
+        self.ui.plot_graphics_view_2.setScene(scene)
+        figure_canvas.update_figure()
+
+        scene.addWidget(figure_canvas)
 
     def show_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
