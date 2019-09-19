@@ -54,6 +54,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.is_played = False
             self.data_session.stop()
             self.data_session = None
+            pdf_image_filename = (
+                    "result_"
+                    + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                    + ".pdf"
+            )
+            self.figure_canvas.save_plot(pdf_image_filename)
+
         else:
             self.ui.record_button.setText("Stop")
             self.figure_canvas.run()

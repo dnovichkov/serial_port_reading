@@ -80,3 +80,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.axes.plot(range(max_point_count), red, 'r', label='RED_LINE')
         self.fig.legend(loc='lower center', shadow=True, ncol=2)
         self.draw()
+
+    def save_plot(self, filename: str):
+        self.fig.savefig(filename)

@@ -1,5 +1,6 @@
 import time
 import copy
+import datetime
 
 import serial
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThread
@@ -72,3 +73,9 @@ class DataSession(QObject):
         self.worker.stop()
         self.thread.quit()
         self.thread.wait(1000)
+        json_file_name = (
+                "data_"
+                + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                + ".json"
+        )
+        self.data_parser.save_results(json_file_name)
