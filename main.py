@@ -36,6 +36,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.is_played = False
         self.data_session = None
         self.figure_canvas = MyDynamicMplCanvas()
+        self.archive_canvas = None
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -63,6 +64,34 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
         self.ui.measurements_list_widget.itemClicked.connect(self.record_clicked)
         self.ui.delete_btn.clicked.connect(self.delete_record_clicked)
+        self.ui.save_btn.clicked.connect(self.record_to_pdf_clicked)
+
+    def get_saving_filename(self, default_name):
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.DontUseNativeDialog
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save plot as", default_name,
+                                                  "PDF Files (*.pdf);;All Files (*)", options=options)
+        return filename
+
+    def record_to_pdf_clicked(self):
+        default_filename = (
+                "plot"
+                + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                + ".pdf"
+        )
+
+        list_items = self.ui.measurements_list_widget.selectedItems()
+        if not list_items:
+            return
+        for item in list_items:
+            text = item.text()
+            default_filename = 'data_' + text + '.pdf'
+            break
+
+        pdf_image_filename = self.get_saving_filename(default_filename)
+        if pdf_image_filename:
+            logger.debug(f'We are going to export {pdf_image_filename}')
+            self.archive_canvas.save_plot(pdf_image_filename)
 
     def play_button_clicked(self):
         sender = self.sender()
@@ -72,12 +101,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.is_played = False
             self.data_session.stop()
             self.data_session = None
-            pdf_image_filename = (
-                    "result_"
-                    + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                    + ".pdf"
-            )
-            self.figure_canvas.save_plot(pdf_image_filename)
             self.ui.measurements_list_widget.clear()
             self.ui.measurements_list_widget.addItems(get_plots_data().keys())
 
@@ -109,13 +132,13 @@ class MainWindow(QtWidgets.QMainWindow):
         if not json_data:
             logger.warning(f'File {filename} is empty')
 
-        figure_canvas = MyDynamicMplCanvas()
-        figure_canvas.line_data = json_data
+        self.archive_canvas = MyDynamicMplCanvas()
+        self.archive_canvas.line_data = json_data
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view_2.setScene(scene)
-        figure_canvas.update_figure()
+        self.archive_canvas.update_figure()
 
-        scene.addWidget(figure_canvas)
+        scene.addWidget(self.archive_canvas)
 
     def show_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
@@ -194,6 +217,7 @@ def main_ui():
     app = QtWidgets.QApplication(sys.argv)
 
     logger.add("Serial_port_reading.log", rotation="500 MB")
+    logger.debug('Application was started')
     win = MainWindow()
     win.show()
 
