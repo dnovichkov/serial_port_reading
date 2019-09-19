@@ -39,7 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.main_plot_tab.set
+        # self.ui.main_plot_tab.set
 
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view.setScene(scene)
@@ -100,7 +100,6 @@ class MainWindow(QtWidgets.QMainWindow):
                                                  sensor_data[1])
 
     def listwidgetclicked(self, item):
-        print('!!! click {}'.format(item.text()))
         filename = 'data_' + item.text() + '.json'
         json_data = {}
         with open(filename, encoding='utf-8') as f:
