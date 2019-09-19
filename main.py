@@ -50,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
         if self.is_played:
-            self.ui.record_button.setText("Play")
+            self.ui.record_button.setText("Start")
             self.is_played = False
             self.data_session.stop()
             self.data_session = None
