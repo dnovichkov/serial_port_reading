@@ -75,6 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def handle_paint_request(self, printer):
         painter = QtGui.QPainter()
+        printer.setOrientation(QtPrintSupport.QPrinter.Landscape)
         painter.begin(printer)
         painter.setViewport(self.ui.plot_graphics_view_2.rect())
         painter.setWindow(self.ui.plot_graphics_view_2.rect())
@@ -85,7 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save plot as", default_name,
-                                                  "PDF Files (*.pdf);;All Files (*)", options=options)
+                                                            "PDF Files (*.pdf);;All Files (*)", options=options)
         return filename
 
     def record_to_pdf_clicked(self):
