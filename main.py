@@ -35,11 +35,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.is_played = False
         self.data_session = None
-        self.figure_canvas = MyDynamicMplCanvas()
         self.archive_canvas = None
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=8, height=5)
         # self.ui.main_plot_tab.set
 
         scene = QtWidgets.QGraphicsScene()
@@ -132,7 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if not json_data:
             logger.warning(f'File {filename} is empty')
 
-        self.archive_canvas = MyDynamicMplCanvas()
+        self.archive_canvas = MyDynamicMplCanvas(width=8, height=5)
         self.archive_canvas.line_data = json_data
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view_2.setScene(scene)
