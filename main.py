@@ -32,6 +32,37 @@ def get_plots_data():
     return result
 
 
+def init_table_model(table_model: QtGui.QStandardItemModel):
+    sensor_count = 8
+    row0 = [QtGui.QStandardItem('Sensor ' + str(i)) for i in range(0, sensor_count // 2)]
+    row1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    row2 = [QtGui.QStandardItem('Sensor ' + str(i)) for i in range(sensor_count // 2, sensor_count)]
+    row3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    for item in row0 + row2:
+        font = QtGui.QFont(item.font())
+        font.setBold(True)
+        item.setFont(font)
+    table_model.appendRow(row0)
+    table_model.appendRow(row1)
+    table_model.appendRow(row2)
+    table_model.appendRow(row3)
+
+
+def vertical_resize_table_view_to_contents(table_view: QtWidgets.QTableView):
+    row_total_height = 0
+
+    count = table_view.verticalHeader().count()
+    for i in range(0, count):
+        if not table_view.verticalHeader().isSectionHidden(i):
+            row_total_height += table_view.verticalHeader().sectionSize(i)
+    if not table_view.horizontalScrollBar().isHidden():
+        row_total_height += table_view.horizontalScrollBar().height()
+
+    if not table_view.horizontalHeader().isHidden():
+        row_total_height += table_view.horizontalHeader().height()
+    table_view.setMinimumHeight(row_total_height)
+
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.is_played = False
@@ -52,14 +83,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.record_button.clicked.connect(self.play_button_clicked)
 
         self.sensor_data_table_model = QtGui.QStandardItemModel(parent=None)
-        sensor_count = 8
-        headers = ['Sensor ' + str(i) for i in range(0, sensor_count)]
-        row = [QtGui.QStandardItem(50 + i) for i in range(0, sensor_count)]
-
-        self.sensor_data_table_model.setHorizontalHeaderLabels(headers)
-        self.sensor_data_table_model.appendRow(row)
+        init_table_model(self.sensor_data_table_model)
 
         self.ui.probe_data_table.setModel(self.sensor_data_table_model)
+        vertical_resize_table_view_to_contents(self.ui.probe_data_table)
+        self.ui.probe_data_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.probe_data_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.ui.probe_data_table.show()
 
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
@@ -151,7 +180,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.figure_canvas.add_point(sensor_data)
         sensor_number = sensor_data[0]
         if sensor_number:
-            self.sensor_data_table_model.setData(self.sensor_data_table_model.index(0, sensor_number - 1),
+            sensor_correct = sensor_number - 1
+            row_index = 2 * (sensor_correct // 4) + 1
+            col_index = sensor_correct % 4
+            self.sensor_data_table_model.setData(self.sensor_data_table_model.index(row_index, col_index),
                                                  sensor_data[1])
 
     def record_clicked(self, item):

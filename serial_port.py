@@ -2,10 +2,9 @@
 
 # Form implementation generated from reading ui file 'serial_port.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -32,8 +31,17 @@ class Ui_MainWindow(object):
         self.verticalLayout_7 = QtWidgets.QVBoxLayout()
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.probe_data_table = QtWidgets.QTableView(self.main_plot_tab)
-        self.probe_data_table.setMaximumSize(QtCore.QSize(16777215, 200))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.probe_data_table.sizePolicy().hasHeightForWidth())
+        self.probe_data_table.setSizePolicy(sizePolicy)
+        self.probe_data_table.setMaximumSize(QtCore.QSize(16777215, 100))
         self.probe_data_table.setObjectName("probe_data_table")
+        self.probe_data_table.horizontalHeader().setVisible(False)
+        self.probe_data_table.horizontalHeader().setHighlightSections(False)
+        self.probe_data_table.verticalHeader().setVisible(False)
+        self.probe_data_table.verticalHeader().setHighlightSections(False)
         self.verticalLayout_7.addWidget(self.probe_data_table)
         self.plot_graphics_view = QtWidgets.QGraphicsView(self.main_plot_tab)
         self.plot_graphics_view.setObjectName("plot_graphics_view")
@@ -228,3 +236,5 @@ class Ui_MainWindow(object):
         self.menuPorts.setTitle(_translate("MainWindow", "Ports"))
         self.actionPorts_settings.setText(_translate("MainWindow", "Port settings"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
+
+
