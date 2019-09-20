@@ -53,18 +53,24 @@ class MyDynamicMplCanvas(MyMplCanvas):
         MyMplCanvas.__init__(self, *args, **kwargs)
         self.line_data = {}
 
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_figure)
+
     def add_point(self, point):
         logger.debug(f'Add point {point} to plot')
         sensor_id = point[0]
         if sensor_id not in self.line_data:
             self.line_data[sensor_id] = []
         self.line_data[sensor_id].append(point[1])
-        self.update_figure()
 
     def run(self):
         self.axes.clear()
         self.line_data = {}
         self.draw()
+        self.timer.start(1000)
+
+    def stop(self):
+        self.timer.stop()
 
     def update_figure(self):
         self.axes.clear()
