@@ -84,8 +84,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         if max_point_count:
             red = [56 for i in range(max_point_count)]
             self.axes.plot(range(max_point_count), red, 'r', label='RED_LINE')
-        self.fig.legend(loc='lower center', shadow=True, ncol=2)
-        self.draw()
+        if self.line_data:
+            self.fig.legend(loc='lower center', shadow=True, ncol=2)
+            self.draw()
 
     def save_plot(self, filename: str):
         self.fig.savefig(filename)

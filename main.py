@@ -10,6 +10,7 @@ import serial
 import serial.tools.list_ports
 from PyQt5 import QtWidgets, QtGui, QtPrintSupport
 from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtCore import QTime, QTimer
 from loguru import logger
 from serial import SerialException
 
@@ -67,6 +68,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.save_btn.clicked.connect(self.record_to_pdf_clicked)
         self.ui.print_btn.clicked.connect(self.handle_print)
 
+        self.curr_time = QTime(00, 00, 00)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.time)
+
+    def time(self):
+        self.curr_time = self.curr_time.addSecs(1)
+        self.ui.time_label.setText(self.curr_time.toString())
+
     def handle_print(self):
         printer = QtPrintSupport.QPrinter(QtPrintSupport.QPrinter.HighResolution)
         dialog = QtPrintSupport.QPrintDialog(printer, self)
@@ -114,18 +123,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(sender.text() + ' was pressed')
         if self.is_played:
             self.ui.record_button.setText("Start")
+            self.curr_time = QTime(00, 00, 00)
             self.figure_canvas.stop()
             self.is_played = False
             self.data_session.stop()
             self.data_session = None
             self.ui.measurements_list_widget.clear()
             self.ui.measurements_list_widget.addItems(get_plots_data().keys())
+            self.timer.stop()
 
         else:
             self.ui.record_button.setText("Stop")
+            self.ui.time_label.setText("00:00:00")
             self.figure_canvas.run()
             self.is_played = True
             self.data_session = DataSession(self, get_config_settings())
+
+            self.timer.start(1000)
             try:
 
                 self.data_session.run()
