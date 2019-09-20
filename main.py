@@ -34,9 +34,9 @@ def get_plots_data():
 
 def init_table_model(table_model: QtGui.QStandardItemModel):
     sensor_count = 8
-    row0 = [QtGui.QStandardItem('Sensor ' + str(i)) for i in range(0, sensor_count // 2)]
+    row0 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(0, sensor_count // 2)]
     row1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
-    row2 = [QtGui.QStandardItem('Sensor ' + str(i)) for i in range(sensor_count // 2, sensor_count)]
+    row2 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(sensor_count // 2, sensor_count)]
     row3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
     for item in row0 + row2:
         font = QtGui.QFont(item.font())
