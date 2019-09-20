@@ -1,4 +1,4 @@
 loguru==0.3.2
 matplotlib==3.1.1
-PyQt5==5.13.0
+PyQt5==5.12.2
 pyserial==3.4

@@ -31,10 +31,11 @@ class SerialWorker(QObject):
     def run(self):
         while self.is_started:
             time.sleep(0.1)
-            line = self.serial_device.readline().decode('utf-8')
-            logger.debug(line)
-            data_copy = copy.deepcopy(line)
-            self.read_data_signal.emit(data_copy)
+            if self.serial_device.is_open:
+                line = self.serial_device.readline().decode('utf-8')
+                logger.debug(line)
+                data_copy = copy.deepcopy(line)
+                self.read_data_signal.emit(data_copy)
 
         logger.debug("We finished reading")
 
