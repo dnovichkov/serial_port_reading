@@ -8,7 +8,7 @@ import json
 import matplotlib
 import serial
 import serial.tools.list_ports
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtPrintSupport
 from PyQt5.QtWidgets import QInputDialog
 from loguru import logger
 from serial import SerialException
@@ -65,6 +65,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.measurements_list_widget.itemClicked.connect(self.record_clicked)
         self.ui.delete_btn.clicked.connect(self.delete_record_clicked)
         self.ui.save_btn.clicked.connect(self.record_to_pdf_clicked)
+        self.ui.print_btn.clicked.connect(self.handle_print)
+
+    def handle_print(self):
+        printer = QtPrintSupport.QPrinter(QtPrintSupport.QPrinter.HighResolution)
+        dialog = QtPrintSupport.QPrintDialog(printer, self)
+        if dialog.exec_() == QtPrintSupport.QPrintDialog.Accepted:
+            self.handle_paint_request(printer)
+
+    def handle_paint_request(self, printer):
+        painter = QtGui.QPainter()
+        painter.begin(printer)
+        painter.setViewport(self.ui.plot_graphics_view_2.rect())
+        painter.setWindow(self.ui.plot_graphics_view_2.rect())
+        self.ui.plot_graphics_view_2.render(painter)
+        painter.end()
 
     def get_saving_filename(self, default_name):
         options = QtWidgets.QFileDialog.Options()
