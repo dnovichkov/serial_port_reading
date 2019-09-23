@@ -248,7 +248,7 @@ def get_config_settings():
 def get_logger_level():
     config = configparser.ConfigParser()
     config.read(CONFIG_FILENAME)
-    level = config.get('LOGGER', {}).get('LEVEL', 'DEBUG')
+    level = config['LOGGER'].get('LEVEL', 'DEBUG')
     return level
 
 
