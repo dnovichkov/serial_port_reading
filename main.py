@@ -245,6 +245,13 @@ def get_config_settings():
     return port_settings
 
 
+def get_logger_level():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILENAME)
+    level = config.get('LOGGER', {}).get('LEVEL', 'DEBUG')
+    return level
+
+
 def main():
     config = configparser.ConfigParser()
     config.read('settings.conf')
@@ -279,7 +286,7 @@ def main():
 def main_ui():
     app = QtWidgets.QApplication(sys.argv)
 
-    logger.add("Serial_port_reading.log", rotation="500 MB")
+    logger.add("Serial_port_reading.log", rotation="500 MB", level=get_logger_level())
     logger.debug('Application was started')
     devices = [port.device for port in serial.tools.list_ports.comports()]
     logger.debug(f'Possible ports are: {devices}')
