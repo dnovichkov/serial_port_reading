@@ -26,6 +26,13 @@ def get_config_settings():
     return port_settings
 
 
+def get_ui_settings():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILENAME)
+    items = {key: os.getenv(key, value) for key, value in config.items('GUI')}
+    return items
+
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         self.is_played = False
@@ -34,6 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.init_text_fields()
         self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=5)
         # self.ui.main_plot_tab.set
 
@@ -152,6 +160,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 'note': self.ui.note_iinput.toPlainText(),
             }
         return result
+
+    def init_text_fields(self):
+        gui_params = get_ui_settings()
+        self.ui.company_input.insertPlainText(gui_params.get('company'))
+        self.ui.location_input.insertPlainText(gui_params.get('location'))
+        self.ui.country_input.insertPlainText(gui_params.get('country'))
+        self.ui.id_input.insertPlainText(gui_params.get('id'))
+        self.ui.load_number_id_input.insertPlainText(gui_params.get('load_number_id'))
+        self.ui.registrated_number_input.insertPlainText(gui_params.get('registrated_number'))
+
+        self.ui.treatment_location_input.insertPlainText(gui_params.get('treatment_location'))
+        self.ui.type_of_material_input.insertPlainText(gui_params.get('type_of_material'))
+        self.ui.quantity_inpeu.insertPlainText(gui_params.get('quantity'))
+        self.ui.verificaion_input.insertPlainText(gui_params.get('verification'))
+        self.ui.note_iinput.insertPlainText(gui_params.get('note'))
 
     def run_reading(self):
         self.ui.record_button.setText("Stop")
