@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1064, 886)
+        MainWindow.resize(1274, 905)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -61,10 +61,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addWidget(self.time_label)
         self.measurement_duration_label = QtWidgets.QLabel(self.main_plot_tab)
         self.measurement_duration_label.setMaximumSize(QtCore.QSize(200, 20))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.measurement_duration_label.setFont(font)
         self.measurement_duration_label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.measurement_duration_label.setObjectName("measurement_duration_label")
         self.verticalLayout_6.addWidget(self.measurement_duration_label)
@@ -204,7 +200,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1064, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1274, 21))
         self.menubar.setObjectName("menubar")
         self.menuPorts = QtWidgets.QMenu(self.menubar)
         self.menuPorts.setObjectName("menuPorts")

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1064</width>
-    <height>886</height>
+    <width>1274</width>
+    <height>905</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,12 +98,6 @@
               <width>200</width>
               <height>20</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
             </property>
             <property name="text">
              <string>Measument duration</string>
@@ -499,7 +493,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1064</width>
+     <width>1274</width>
      <height>21</height>
     </rect>
    </property>

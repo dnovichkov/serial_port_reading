@@ -34,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=8, height=5)
+        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=5)
         # self.ui.main_plot_tab.set
 
         scene = QtWidgets.QGraphicsScene()
@@ -194,7 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if not json_data:
             logger.warning(f'File {filename} is empty')
 
-        self.archive_canvas = MyDynamicMplCanvas(width=8, height=5)
+        self.archive_canvas = MyDynamicMplCanvas(width=10, height=8)
         self.archive_canvas.line_data = json_data.get('points')
         self.archive_canvas.duration = json_data.get('params', {}).get('duration', 0)
         # if json_data:
