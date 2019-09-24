@@ -62,9 +62,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.curr_time = QTime(00, 00, 00)
         self.timer = QTimer()
-        self.timer.timeout.connect(self.time)
+        self.timer.timeout.connect(self.update_time)
 
-    def time(self):
+    def update_time(self):
         self.curr_time = self.curr_time.addSecs(1)
         self.ui.time_label.setText(self.curr_time.toString())
 
@@ -114,17 +114,49 @@ class MainWindow(QtWidgets.QMainWindow):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
         if self.is_played:
-            self.run_reading()
-
-        else:
             self.stop_reading()
 
-    def stop_reading(self):
+        else:
+            self.run_reading()
+
+    def get_duration(self):
+        durations_map = \
+            {
+                '24h': 24 * 60 * 60,
+                '12h': 12 * 60 * 60,
+                '1h': 60 * 60,
+            }
+        duration_label_value = self.ui.measument_durtion_combo_box.currentText()
+        default_duration = 60 * 60
+        duration = durations_map.get(duration_label_value, default_duration)
+        return duration
+
+    def get_params(self):
+        result = \
+            {
+                'duration': self.get_duration(),
+                'company': self.ui.company_input.toPlainText(),
+                'id': self.ui.id_input.toPlainText(),
+                'location': self.ui.location_input.toPlainText(),
+                'country': self.ui.country_input.toPlainText(),
+                'load_number_id': self.ui.load_number_id_input.toPlainText(),
+                'registrated_number': self.ui.registrated_number_input.toPlainText(),
+                'treatment_location': self.ui.treatment_location_input.toPlainText(),
+                'type_of_material': self.ui.type_of_material_input.toPlainText(),
+                'quantity': self.ui.quantity_inpeu.toPlainText(),
+                'verification': self.ui.verificaion_input.toPlainText(),
+                'note': self.ui.note_iinput.toPlainText(),
+            }
+        return result
+
+    def run_reading(self):
         self.ui.record_button.setText("Stop")
         self.ui.time_label.setText("00:00:00")
-        self.figure_canvas.run()
+
+        duration = self.get_duration()
+        self.figure_canvas.run(duration)
         self.is_played = True
-        self.data_session = DataSession(self, get_config_settings())
+        self.data_session = DataSession(self, self.get_params(), get_config_settings())
         self.timer.start(1000)
         try:
 
@@ -132,7 +164,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except SerialException as e:
             logger.error(f'Error while reading data: {e}')
 
-    def run_reading(self):
+    def stop_reading(self):
         self.ui.record_button.setText("Start")
         self.curr_time = QTime(00, 00, 00)
         self.figure_canvas.stop()
@@ -144,7 +176,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.stop()
 
     def add_data(self, sensor_data):
-        self.statusBar().showMessage(str(sensor_data))
         self.figure_canvas.add_point(sensor_data)
         sensor_number = sensor_data[0]
         if sensor_number:
@@ -164,7 +195,12 @@ class MainWindow(QtWidgets.QMainWindow):
             logger.warning(f'File {filename} is empty')
 
         self.archive_canvas = MyDynamicMplCanvas(width=8, height=5)
-        self.archive_canvas.line_data = json_data
+        self.archive_canvas.line_data = json_data.get('points')
+        self.archive_canvas.duration = json_data.get('params', {}).get('duration', 0)
+        # if json_data:
+        #     lens = [len(x) for x in json_data.values()]
+        #     print(max(lens))
+        #     # self.archive_canvas.red_points = {0: 56, self.duration / 3600: 56}
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view_2.setScene(scene)
         self.archive_canvas.update_figure()

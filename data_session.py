@@ -47,10 +47,10 @@ class SerialWorker(QObject):
 class DataSession(QObject):
     signal_start_background_job = pyqtSignal()
 
-    def __init__(self, plot_painter, port_settings=DEFAULT_PORT_SETTINGS):
+    def __init__(self, plot_painter, params, port_settings=DEFAULT_PORT_SETTINGS):
         super().__init__()
 
-        self.data_parser = DataParser()
+        self.data_parser = DataParser(params)
         self.plot_painter = plot_painter
 
         self.worker = SerialWorker(port_settings)

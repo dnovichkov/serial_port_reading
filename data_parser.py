@@ -4,8 +4,10 @@ from loguru import logger
 
 
 class DataParser:
-    def __init__(self):
+    def __init__(self, params):
         self.parsing_results = {}
+
+        self.params = params
 
     def parse(self, arduino_string: str):
         """
@@ -34,7 +36,7 @@ class DataParser:
         Return parsing results.
         :return: Parsing results as dictionary {sensor_id: [measurement_values]}
         """
-        return self.parsing_results
+        return {'points': self.parsing_results, 'params': self.params}
 
     def save_results(self, json_filename: str):
         """
