@@ -197,6 +197,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.archive_canvas = MyDynamicMplCanvas(width=10, height=8)
         self.archive_canvas.line_data = json_data.get('points')
         self.archive_canvas.duration = json_data.get('params', {}).get('duration', 0)
+        self.archive_canvas.params = json_data.get('params')
         # if json_data:
         #     lens = [len(x) for x in json_data.values()]
         #     print(max(lens))
