@@ -61,8 +61,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.print_btn.clicked.connect(self.handle_print)
 
         self.curr_time = QTime(00, 00, 00)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_time)
+        self.time_update_timer = QTimer()
+        self.time_update_timer.timeout.connect(self.update_time)
+
+        self.stop_timer = QTimer()
+        self.stop_timer.setSingleShot(True)
+        self.stop_timer.timeout.connect(self.stop_reading)
 
     def update_time(self):
         self.curr_time = self.curr_time.addSecs(1)
@@ -157,7 +161,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.figure_canvas.run(duration)
         self.is_played = True
         self.data_session = DataSession(self, self.get_params(), get_config_settings())
-        self.timer.start(1000)
+        self.time_update_timer.start(1000)
+        self.stop_timer.start((duration + 1) * 1000)
         try:
 
             self.data_session.run()
@@ -173,7 +178,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data_session = None
         self.ui.measurements_list_widget.clear()
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
-        self.timer.stop()
+        self.time_update_timer.stop()
+        self.stop_timer.stop()
 
     def add_data(self, sensor_data):
         self.figure_canvas.add_point(sensor_data)
