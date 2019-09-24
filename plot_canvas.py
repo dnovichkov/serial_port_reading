@@ -101,9 +101,22 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def update_figure(self):
         self.axes.clear()
-        self.fig.gca().set_ylim([0, 100])
+        self.fig.gca().set_ylim([0, 101])
+
+        major_ticks = range(0, 101, 20)
+        minor_ticks = range(0, 101, 5)
+        self.fig.gca().set_yticks(major_ticks)
+        self.fig.gca().set_yticks(minor_ticks, minor=True)
+        # self.fig.gca().grid(True)
+
+        self.fig.gca().grid(which='both')
+        self.fig.gca().grid(which='minor', alpha=0.2)
+        self.fig.gca().grid(which='major', alpha=0.5)
+
         if self.duration:
-            self.fig.gca().set_xlim([0, self.duration / 3600])
+            duration_in_hours = self.duration / 3600
+            self.fig.gca().set_xlim([0, duration_in_hours])
+
         for id_, points in self.line_data.items():
             color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
             plot_count = len(points)
