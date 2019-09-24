@@ -114,29 +114,34 @@ class MainWindow(QtWidgets.QMainWindow):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
         if self.is_played:
-            self.ui.record_button.setText("Start")
-            self.curr_time = QTime(00, 00, 00)
-            self.figure_canvas.stop()
-            self.is_played = False
-            self.data_session.stop()
-            self.data_session = None
-            self.ui.measurements_list_widget.clear()
-            self.ui.measurements_list_widget.addItems(get_plots_data().keys())
-            self.timer.stop()
+            self.run_reading()
 
         else:
-            self.ui.record_button.setText("Stop")
-            self.ui.time_label.setText("00:00:00")
-            self.figure_canvas.run()
-            self.is_played = True
-            self.data_session = DataSession(self, get_config_settings())
+            self.stop_reading()
 
-            self.timer.start(1000)
-            try:
+    def stop_reading(self):
+        self.ui.record_button.setText("Stop")
+        self.ui.time_label.setText("00:00:00")
+        self.figure_canvas.run()
+        self.is_played = True
+        self.data_session = DataSession(self, get_config_settings())
+        self.timer.start(1000)
+        try:
 
-                self.data_session.run()
-            except SerialException as e:
-                logger.error(f'Error while reading data: {e}')
+            self.data_session.run()
+        except SerialException as e:
+            logger.error(f'Error while reading data: {e}')
+
+    def run_reading(self):
+        self.ui.record_button.setText("Start")
+        self.curr_time = QTime(00, 00, 00)
+        self.figure_canvas.stop()
+        self.is_played = False
+        self.data_session.stop()
+        self.data_session = None
+        self.ui.measurements_list_widget.clear()
+        self.ui.measurements_list_widget.addItems(get_plots_data().keys())
+        self.timer.stop()
 
     def add_data(self, sensor_data):
         self.statusBar().showMessage(str(sensor_data))
