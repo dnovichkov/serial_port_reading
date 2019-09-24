@@ -55,6 +55,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update_figure)
+        self.red_points = {}
+        self.params = {}
+        self.duration = 0
 
     def add_point(self, point):
         logger.debug(f'Add point {point} to plot')
@@ -63,30 +66,78 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.line_data[sensor_id] = []
         self.line_data[sensor_id].append(point[1])
 
-    def run(self):
+    def run(self, duration):
         self.axes.clear()
+        self.duration = duration
+        self.fig.gca().set_ylim([0, 100])
+        self.fig.gca().set_xlim([0, self.duration / 3600])
         self.line_data = {}
         self.draw()
         self.timer.start(1000)
 
     def stop(self):
         self.timer.stop()
+        self.duration = 0
+
+    def get_titles(self):
+        titles = {}
+        title_1 = f'Type of material: {self.params.get("type_of_material")}\n' \
+                  f'Quantity: {self.params.get("quantity")}\n' \
+                  f'Location: {self.params.get("location")}\n' \
+                  f'Load number ID: {self.params.get("load_number_id")}\n' \
+                  f'Treatment duration: {self.params.get("range")}'
+        titles['left'] = title_1
+
+        title_2 = f'Temperature reference: 56°C\n' \
+                  f'Time above: ???\n\n\n'
+        titles['center'] = title_2
+        title_3 = f'Company name: {self.params.get("company")}\n' \
+                  f'Reg. number: {self.params.get("registrated_number")}\n' \
+                  f'Location: {self.params.get("location")}\n' \
+                  f'Country: {self.params.get("country")}\n'
+        titles['right'] = title_3
+
+        return titles
 
     def update_figure(self):
         self.axes.clear()
-        max_point_count = 0
+        self.fig.gca().set_ylim([0, 101])
+
+        major_ticks = range(0, 101, 20)
+        minor_ticks = range(0, 101, 5)
+        self.fig.gca().set_yticks(major_ticks)
+        self.fig.gca().set_yticks(minor_ticks, minor=True)
+        # self.fig.gca().grid(True)
+
+        if self.duration == 24 * 3600:
+            self.fig.gca().set_xticks(range(0, 25, 1))
+        elif self.duration == 12 * 3600:
+            self.fig.gca().set_xticks(range(0, 13, 1))
+
+        self.fig.gca().grid(which='both')
+        self.fig.gca().grid(which='minor', alpha=0.2)
+        self.fig.gca().grid(which='major', alpha=0.5)
+
+        if self.duration:
+            duration_in_hours = self.duration / 3600
+            self.fig.gca().set_xlim([0, duration_in_hours])
+
         for id_, points in self.line_data.items():
             color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
             plot_count = len(points)
-            max_point_count = max(max_point_count, plot_count)
             name = f'Temp_{id_}'
-            self.axes.plot(range(plot_count), points, color, label=name)
-        if max_point_count:
-            red = [56 for i in range(max_point_count)]
-            self.axes.plot(range(max_point_count), red, 'r', label='RED_LINE')
-        if self.line_data:
-            self.fig.legend(loc='lower center', shadow=True, ncol=2)
-            self.draw()
+            x_coords = [x / 3600 for x in range(plot_count)]
+            self.axes.plot(x_coords, points, color, label=name)
+
+        self.red_points = {0: 56, self.duration / 3600: 56}
+        if self.red_points:
+            self.axes.plot(list(self.red_points.keys()), list(self.red_points.values()), 'r', label='RED_LINE')
+        self.fig.legend(loc='lower center', shadow=False, ncol=2)
+        if self.params:
+            titles = self.get_titles()
+            for location, title in titles.items():
+                self.fig.gca().set_title(title, loc=location, wrap=True, fontsize=10)
+        self.draw()
 
     def save_plot(self, filename: str):
         self.fig.savefig(filename)
