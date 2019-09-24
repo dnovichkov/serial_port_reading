@@ -109,6 +109,11 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.fig.gca().set_yticks(minor_ticks, minor=True)
         # self.fig.gca().grid(True)
 
+        if self.duration == 24 * 3600:
+            self.fig.gca().set_xticks(range(0, 25, 1))
+        elif self.duration == 12 * 3600:
+            self.fig.gca().set_xticks(range(0, 13, 1))
+
         self.fig.gca().grid(which='both')
         self.fig.gca().grid(which='minor', alpha=0.2)
         self.fig.gca().grid(which='major', alpha=0.5)
