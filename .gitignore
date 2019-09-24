@@ -10,3 +10,5 @@ build/*
 dist/*
 *.log
 plot_*.html
+data_*.json
+result_*.pdf
