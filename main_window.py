@@ -6,7 +6,7 @@ import os
 import serial
 from PyQt5 import QtGui, QtPrintSupport, QtWidgets
 from PyQt5.QtCore import QTime, QTimer
-from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from loguru import logger
 from serial import SerialException
 
@@ -48,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view.setScene(scene)
 
-        self.ui.actionPorts_settings.triggered.connect(self.show_dialog)
+        self.ui.actionPorts_settings.triggered.connect(self.show_settings_dialog)
 
         scene.addWidget(self.figure_canvas)
         self.ui.record_button.clicked.connect(self.play_button_clicked)
@@ -75,6 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stop_timer = QTimer()
         self.stop_timer.setSingleShot(True)
         self.stop_timer.timeout.connect(self.stop_reading)
+        self.ui.actionAbout.triggered.connect(self.show_about_dialog)
 
     def closeEvent(self, event):
         logger.debug("Last windows closed, exiting ...")
@@ -254,7 +255,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         scene.addWidget(self.archive_canvas)
 
-    def show_dialog(self):
+    def show_settings_dialog(self):
         devices = [port.device for port in serial.tools.list_ports.comports()]
         config = configparser.ConfigParser()
         config.read(CONFIG_FILENAME)
@@ -271,6 +272,9 @@ class MainWindow(QtWidgets.QMainWindow):
             config.set("DATA", "SERIAL_PORT", str(text))
             with open(CONFIG_FILENAME, "w") as config_file:
                 config.write(config_file)
+
+    def show_about_dialog(self):
+        QMessageBox.about(self, "About", '<a href="https://palete.co.rs/">https://palete.co.rs/</a>')
 
     def delete_record_clicked(self):
         list_items = self.ui.measurements_list_widget.selectedItems()
