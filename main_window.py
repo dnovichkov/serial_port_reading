@@ -17,6 +17,48 @@ from serial_port import Ui_MainWindow
 CONFIG_FILENAME = 'settings.conf'
 
 
+def get_plots_data():
+    result = {}
+    file_folder = os.getcwd()
+    for file in os.listdir(file_folder):
+        if file.endswith(".json") and file.startswith("data_"):
+            plot_dt = file[5:-5]
+            result[plot_dt] = file
+    return result
+
+
+def init_table_model(table_model: QtGui.QStandardItemModel):
+    sensor_count = 8
+    column0 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(0, sensor_count // 2)]
+    column1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    column2 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(sensor_count // 2, sensor_count)]
+    column3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    for item in column0 + column2:
+        font = QtGui.QFont(item.font())
+        font.setBold(True)
+        item.setFont(font)
+
+    table_model.appendColumn(column0)
+    table_model.appendColumn(column1)
+    table_model.appendColumn(column2)
+    table_model.appendColumn(column3)
+
+
+def vertical_resize_table_view_to_contents(table_view: QtWidgets.QTableView):
+    row_total_height = 0
+
+    count = table_view.verticalHeader().count()
+    for i in range(0, count):
+        if not table_view.verticalHeader().isSectionHidden(i):
+            row_total_height += table_view.verticalHeader().sectionSize(i)
+    if not table_view.horizontalScrollBar().isHidden():
+        row_total_height += table_view.horizontalScrollBar().height()
+
+    if not table_view.horizontalHeader().isHidden():
+        row_total_height += table_view.horizontalHeader().height()
+    table_view.setMinimumHeight(row_total_height)
+
+
 def get_config_settings():
     config = configparser.ConfigParser()
     config.read(CONFIG_FILENAME)
@@ -76,6 +118,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stop_timer.setSingleShot(True)
         self.stop_timer.timeout.connect(self.stop_reading)
         self.ui.actionAbout.triggered.connect(self.show_about_dialog)
+        self.current_sensor_values = {}
+
+        self.aboving_timer = QTimer()
+        self.aboving_timer.setSingleShot(True)
+        self.aboving_timer.timeout.connect(self.stop_reading)
 
     def closeEvent(self, event):
         logger.debug("Last windows closed, exiting ...")
@@ -221,16 +268,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
         self.time_update_timer.stop()
         self.stop_timer.stop()
+        self.aboving_timer.stop()
 
     def add_data(self, sensor_data):
         self.figure_canvas.add_point(sensor_data)
         sensor_number = sensor_data[0]
+        sensor_value = sensor_data[1]
         if sensor_number:
             sensor_correct = sensor_number - 1
             col_index = 2 * (sensor_correct // 4) + 1
             row_index = sensor_correct % 4
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(row_index, col_index),
-                                                 sensor_data[1])
+                                                 sensor_value)
+            self.current_sensor_values[sensor_number] = sensor_value
+            if all([x > 56 for x in self.current_sensor_values.values()]):
+                logger.debug('All values are above 56')
+                if not self.aboving_timer.isActive():
+                    self.aboving_timer.start(30 * 60 * 1000)
+                    # TODO: Save time
 
     def record_clicked(self, item):
         filename = 'data_' + item.text() + '.json'
@@ -245,10 +300,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.archive_canvas.line_data = json_data.get('points')
         self.archive_canvas.duration = json_data.get('params', {}).get('duration', 0)
         self.archive_canvas.params = json_data.get('params')
-        # if json_data:
-        #     lens = [len(x) for x in json_data.values()]
-        #     print(max(lens))
-        #     # self.archive_canvas.red_points = {0: 56, self.duration / 3600: 56}
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view_2.setScene(scene)
         self.archive_canvas.update_figure()
@@ -286,45 +337,3 @@ class MainWindow(QtWidgets.QMainWindow):
             filename = 'data_' + text + '.json'
             logger.debug(f'We are going to delete {filename}')
             os.remove(filename)
-
-
-def get_plots_data():
-    result = {}
-    file_folder = os.getcwd()
-    for file in os.listdir(file_folder):
-        if file.endswith(".json") and file.startswith("data_"):
-            plot_dt = file[5:-5]
-            result[plot_dt] = file
-    return result
-
-
-def init_table_model(table_model: QtGui.QStandardItemModel):
-    sensor_count = 8
-    column0 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(0, sensor_count // 2)]
-    column1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
-    column2 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(sensor_count // 2, sensor_count)]
-    column3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
-    for item in column0 + column2:
-        font = QtGui.QFont(item.font())
-        font.setBold(True)
-        item.setFont(font)
-
-    table_model.appendColumn(column0)
-    table_model.appendColumn(column1)
-    table_model.appendColumn(column2)
-    table_model.appendColumn(column3)
-
-
-def vertical_resize_table_view_to_contents(table_view: QtWidgets.QTableView):
-    row_total_height = 0
-
-    count = table_view.verticalHeader().count()
-    for i in range(0, count):
-        if not table_view.verticalHeader().isSectionHidden(i):
-            row_total_height += table_view.verticalHeader().sectionSize(i)
-    if not table_view.horizontalScrollBar().isHidden():
-        row_total_height += table_view.horizontalScrollBar().height()
-
-    if not table_view.horizontalHeader().isHidden():
-        row_total_height += table_view.horizontalHeader().height()
-    table_view.setMinimumHeight(row_total_height)
