@@ -156,6 +156,20 @@ class MyDynamicMplCanvas(MyMplCanvas):
             titles = self.get_titles()
             for location, title in titles.items():
                 self.fig.gca().set_title(title, loc=location, wrap=True, fontsize=10)
+            device_text = 'Measuring device: HT15\nManufacturer: DOO Draft'
+            x_coord_for_text = -8
+            x_coord_for_person = 55
+            if self.duration == 3600 * 12:
+                x_coord_for_text = -1.6
+                x_coord_for_person = 11
+            if self.duration == 3600 * 24:
+                x_coord_for_text = -3.2
+                x_coord_for_person = 22
+            self.axes.text(x_coord_for_text, -10, device_text,
+                           {'color': 'black', 'fontsize': 9, 'ha': 'left', 'va': 'center', })
+            person_text = '______________________\nPerson responsible'
+            self.axes.text(x_coord_for_person, -10, person_text,
+                           {'color': 'black', 'fontsize': 9, 'ha': 'center', 'va': 'center', })
         self.draw()
 
     def save_plot(self, filename: str):
