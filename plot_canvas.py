@@ -136,14 +136,20 @@ class MyDynamicMplCanvas(MyMplCanvas):
             color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
             plot_count = len(points)
             name = f'Temp_{id_}'
-            x_coords = [x / 3600 for x in range(plot_count)]
+            if self.duration == 3600:
+                x_coords = [x / 60 for x in range(plot_count)]
+            else:
+                x_coords = [x / 3600 for x in range(plot_count)]
             self.axes.plot(x_coords, points, color, label=name)
 
         self.red_points = {0: 56, self.duration / 3600: 56}
         if self.duration == 3600:
             self.red_points[60] = 56
         if self.red_points:
-            self.axes.plot(list(self.red_points.keys()), list(self.red_points.values()), 'r', label='RED_LINE')
+            self.axes.plot(
+                list(self.red_points.keys()), list(self.red_points.values()),
+                'r', label='RED_LINE', linewidth=1.0,
+                antialiased=True)
         self.fig.legend(loc='lower center', shadow=False, ncol=2)
         if self.params:
             titles = self.get_titles()
