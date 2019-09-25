@@ -76,6 +76,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stop_timer.setSingleShot(True)
         self.stop_timer.timeout.connect(self.stop_reading)
 
+    def closeEvent(self, event):
+        logger.debug("Last windows closed, exiting ...")
+        params = self.get_params()
+        params.pop('duration', None)
+
+        config = configparser.ConfigParser()
+
+        config.read(CONFIG_FILENAME)
+        try:
+            for name, value in params.items():
+                config.set("GUI", name, str(value))
+            with open(CONFIG_FILENAME, "w") as config_file:
+                config.write(config_file)
+        except:
+            logger.warning("Error while saving GUI settings")
+        super(MainWindow, self).closeEvent(event)
+
     def update_time(self):
         self.curr_time = self.curr_time.addSecs(1)
         self.ui.time_label.setText(self.curr_time.toString())
