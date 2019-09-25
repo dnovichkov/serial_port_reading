@@ -21,7 +21,7 @@ PLOT_COLORS = \
         4: 'm',
         5: 'y',
         6: 'k',
-        7: 'w',
+        7: '#7fff00',
         8: '#ff00ff',
     }
 
@@ -150,7 +150,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 list(self.red_points.keys()), list(self.red_points.values()),
                 'r', label='RED_LINE', linewidth=1.0,
                 antialiased=True)
-        self.fig.legend(loc='lower center', shadow=False, ncol=2)
+
+        self.fig.legend(loc='lower center', shadow=False, ncol=4, framealpha=0.4)
         if self.params:
             titles = self.get_titles()
             for location, title in titles.items():

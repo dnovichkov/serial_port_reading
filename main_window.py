@@ -42,7 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.init_text_fields()
-        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=5)
+        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=6)
         # self.ui.main_plot_tab.set
 
         scene = QtWidgets.QGraphicsScene()
@@ -227,8 +227,8 @@ class MainWindow(QtWidgets.QMainWindow):
         sensor_number = sensor_data[0]
         if sensor_number:
             sensor_correct = sensor_number - 1
-            row_index = 2 * (sensor_correct // 4) + 1
-            col_index = sensor_correct % 4
+            col_index = 2 * (sensor_correct // 4) + 1
+            row_index = sensor_correct % 4
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(row_index, col_index),
                                                  sensor_data[1])
 
@@ -300,18 +300,19 @@ def get_plots_data():
 
 def init_table_model(table_model: QtGui.QStandardItemModel):
     sensor_count = 8
-    row0 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(0, sensor_count // 2)]
-    row1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
-    row2 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(sensor_count // 2, sensor_count)]
-    row3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
-    for item in row0 + row2:
+    column0 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(0, sensor_count // 2)]
+    column1 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    column2 = [QtGui.QStandardItem('Sensor ' + str(i + 1)) for i in range(sensor_count // 2, sensor_count)]
+    column3 = [QtGui.QStandardItem("-") for i in range(0, sensor_count // 2)]
+    for item in column0 + column2:
         font = QtGui.QFont(item.font())
         font.setBold(True)
         item.setFont(font)
-    table_model.appendRow(row0)
-    table_model.appendRow(row1)
-    table_model.appendRow(row2)
-    table_model.appendRow(row3)
+
+    table_model.appendColumn(column0)
+    table_model.appendColumn(column1)
+    table_model.appendColumn(column2)
+    table_model.appendColumn(column3)
 
 
 def vertical_resize_table_view_to_contents(table_view: QtWidgets.QTableView):
