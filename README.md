@@ -35,12 +35,6 @@ SERIAL_PORT = COM1
 # Be sure to set this to the same rate used on the Arduino
 SERIAL_RATE = 9600
 ```
-
-If you want to get all ports in your system you can do it by command:
-
- ```
-python -m serial.tools.list_ports -v
- ```
  
 Data format from serial port is:
 ```
@@ -48,7 +42,23 @@ Temperature1=56
 Temperature2=54
 Temperature3=53
 ```
- 
+If you want to change design, you should use serial_port.ui file. It can be opened by QtDesigner.
+
+After changing and saving this file you shoul run
+```
+pyuic5 serial_port.ui -o serial_port.py
+```
+After that you can test programm by
+```
+python main.py
+```
+If everything is correct, you can build the application to executable file:
+```
+pip install pyinstaller
+pyinstaller main.spec
+```
+Please, copy settings.conf manually and test the application.
+
 Some code for debug purposes:
 ```
 import serial
@@ -58,10 +68,4 @@ ser.write(b'Temperature1=55\nTemperature2=56\n')
 ser.write(b'Temperature1=51\nTemperature2=55\n')
 ser.write(b'Temperature2=58\nTemperature1=60\n')
 ser.close()   
-```
-
-If you want to create executable file:
-```
-pip install pyinstaller
-pyinstaller main.spec
 ```
