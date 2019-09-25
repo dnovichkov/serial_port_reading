@@ -103,7 +103,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.axes.clear()
         self.fig.gca().set_ylim([0, 101])
 
-        major_ticks = range(0, 101, 20)
+        major_ticks = range(0, 101, 10)
         minor_ticks = range(0, 101, 5)
         self.fig.gca().set_yticks(major_ticks)
         self.fig.gca().set_yticks(minor_ticks, minor=True)
@@ -113,6 +113,14 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.fig.gca().set_xticks(range(0, 25, 1))
         elif self.duration == 12 * 3600:
             self.fig.gca().set_xticks(range(0, 13, 1))
+        elif self.duration == 3600:
+
+            major_x_ticks = range(0, 61, 10)
+            minor_x_ticks = range(0, 61, 5)
+            self.fig.gca().set_xticks(major_x_ticks)
+            self.fig.gca().set_xticks(minor_x_ticks, minor=True)
+
+            # self.fig.gca().set_xticks(range(0, 61, 1))
 
         self.fig.gca().grid(which='both')
         self.fig.gca().grid(which='minor', alpha=0.2)
@@ -121,6 +129,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         if self.duration:
             duration_in_hours = self.duration / 3600
             self.fig.gca().set_xlim([0, duration_in_hours])
+        if self.duration == 3600:
+            self.fig.gca().set_xlim([0, 61])
 
         for id_, points in self.line_data.items():
             color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
@@ -130,6 +140,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.axes.plot(x_coords, points, color, label=name)
 
         self.red_points = {0: 56, self.duration / 3600: 56}
+        if self.duration == 3600:
+            self.red_points[60] = 56
         if self.red_points:
             self.axes.plot(list(self.red_points.keys()), list(self.red_points.values()), 'r', label='RED_LINE')
         self.fig.legend(loc='lower center', shadow=False, ncol=2)
