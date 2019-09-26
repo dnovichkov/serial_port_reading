@@ -80,23 +80,23 @@ class MyDynamicMplCanvas(FigureCanvas):
 
     def get_titles(self):
         titles = {}
-        title_1 = f'Type of material: {self.params.get("type_of_material")}\n' \
-                  f'Quantity: {self.params.get("quantity")}\n' \
-                  f'Location: {self.params.get("location")}\n' \
-                  f'Load ID: {self.params.get("load_number_id")}\n' \
-                  f'Time of treatment: {self.params.get("range")}'
+        title_1 = f'Type of material: {self.params.get("type_of_material", "-")}\n' \
+                  f'Quantity: {self.params.get("quantity", "-")}\n' \
+                  f'Location: {self.params.get("location", "-")}\n' \
+                  f'Load ID: {self.params.get("load_number_id", "-")}\n' \
+                  f'Time of treatment: {self.params.get("range", "-")}'
         titles['left'] = title_1
 
         title_2 = f'Reference temperature: 56°C\n' \
                   f'Period above ref. temp.: ???\n' \
-                  f'Beginning: ???\n' \
-                  f'End: ???'
+                  f'Beginning: {self.params.get("start", "-")}\n' \
+                  f'End: {self.params.get("finish", "-")}'
         titles['center'] = title_2
-        title_3 = f'Company: {self.params.get("company")}\n' \
-                  f'ID: {self.params.get("id")}\n' \
-                  f'Registrated number: {self.params.get("registrated_number")}\n' \
-                  f'Address: {self.params.get("address")}\n'\
-                  f'Country: {self.params.get("country")}'
+        title_3 = f'Company: {self.params.get("company", "-")}\n' \
+                  f'ID: {self.params.get("id", "-")}\n' \
+                  f'Registrated number: {self.params.get("registrated_number", "-")}\n' \
+                  f'Address: {self.params.get("address", "-")}\n'\
+                  f'Country: {self.params.get("country", "-")}'
         titles['right'] = title_3
 
         return titles
