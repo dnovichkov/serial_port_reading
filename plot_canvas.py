@@ -66,13 +66,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.line_data[sensor_id] = []
         self.line_data[sensor_id].append(point[1])
 
-    def run(self, duration):
-        self.axes.clear()
+    def set_duration(self, duration):
         self.duration = duration
         self.fig.gca().set_ylim([0, 100])
         self.fig.gca().set_xlim([0, self.duration / 3600])
-        self.line_data = {}
         self.draw()
+
+    def run(self, duration):
+        self.axes.clear()
+        self.line_data = {}
+        self.set_duration(duration)
         self.timer.start(1000)
 
     def stop(self):
