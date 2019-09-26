@@ -28,7 +28,9 @@ PLOT_COLORS = \
 DEFAULT_COLOR = '#008080'
 
 
-class MyMplCanvas(FigureCanvas):
+class MyDynamicMplCanvas(FigureCanvas):
+    """A canvas that updates itself every second with a new plot."""
+
     def __init__(self, parent=None, width=6, height=5, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
@@ -42,15 +44,6 @@ class MyMplCanvas(FigureCanvas):
                 QSizePolicy.Expanding,
                 QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-
-    def compute_initial_figure(self):
-        pass
-
-
-class MyDynamicMplCanvas(MyMplCanvas):
-    """A canvas that updates itself every second with a new plot."""
-    def __init__(self, *args, **kwargs):
-        MyMplCanvas.__init__(self, *args, **kwargs)
         self.line_data = {}
 
         self.timer = QtCore.QTimer(self)
@@ -58,6 +51,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.red_points = {}
         self.params = {}
         self.duration = 0
+
+    def compute_initial_figure(self):
+        pass
 
     def add_point(self, point):
         logger.debug(f'Add point {point} to plot')
@@ -138,6 +134,14 @@ class MyDynamicMplCanvas(MyMplCanvas):
         if self.duration == 3600:
             self.fig.gca().set_xlim([0, 61])
 
+        self.red_points = {0: 56, self.duration / 3600: 56}
+        if self.duration == 3600:
+            self.red_points[60] = 56
+        self.axes.plot(
+            list(self.red_points.keys()), list(self.red_points.values()),
+            'r', label='ref. temp', linewidth=1.0,
+            antialiased=True)
+
         for id_, points in self.line_data.items():
             color = PLOT_COLORS.get(int(id_), DEFAULT_COLOR)
             plot_count = len(points)
@@ -147,15 +151,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
             else:
                 x_coords = [x / 3600 for x in range(plot_count)]
             self.axes.plot(x_coords, points, color, label=name)
-
-        self.red_points = {0: 56, self.duration / 3600: 56}
-        if self.duration == 3600:
-            self.red_points[60] = 56
-        if self.red_points:
-            self.axes.plot(
-                list(self.red_points.keys()), list(self.red_points.values()),
-                'r', label='ref. temp', linewidth=1.0,
-                antialiased=True)
 
         self.fig.legend(loc='lower center', shadow=False, ncol=5, framealpha=0.4)
         if self.params:
