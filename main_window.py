@@ -84,15 +84,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.init_text_fields()
-        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=6)
-        # self.ui.main_plot_tab.set
 
+        self.figure_canvas = MyDynamicMplCanvas(self.ui.plot_graphics_view, width=10, height=6)
         scene = QtWidgets.QGraphicsScene()
         self.ui.plot_graphics_view.setScene(scene)
-
+        self.figure_canvas.update_figure()
+        self.figure_canvas.set_duration(3600 * 24)
+        self.figure_canvas.fig.subplots_adjust(top=0.97, left=0.05, right=0.95)
+        scene.addWidget(self.figure_canvas)
         self.ui.actionPorts_settings.triggered.connect(self.show_settings_dialog)
 
-        scene.addWidget(self.figure_canvas)
         self.ui.record_button.clicked.connect(self.play_button_clicked)
 
         self.sensor_data_table_model = QtGui.QStandardItemModel(parent=None)
