@@ -41,12 +41,13 @@ class DataParser:
         self.params['range'] = self.start_time + ' - ' + stop_time
         return {'points': self.parsing_results, 'params': self.params}
 
-    def save_results(self, json_filename: str):
+    def save_results(self, json_filename: str, additional_params: dict):
         """
         Save results in JSON-format.
         :param json_filename:
         :return:
         """
+        self.params.update(additional_params)
         with open(json_filename, "w") as f:
             for chunk in json.JSONEncoder(indent=4, ensure_ascii=False).iterencode(
                     self.get_results()

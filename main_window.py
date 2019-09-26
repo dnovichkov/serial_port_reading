@@ -123,7 +123,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.aboving_timer = QTimer()
         self.aboving_timer.setSingleShot(True)
-        self.aboving_timer.timeout.connect(self.stop_reading)
+        self.aboving_timer.timeout.connect(self.aboving_timer_signal)
+        self.start_aboving_time = None
+        self.finish_aboving_time = None
+
+    def aboving_timer_signal(self):
+        self.finish_aboving_time = datetime.datetime.now()
+        self.stop_reading()
 
     def closeEvent(self, event):
         logger.debug("Last windows closed, exiting ...")
@@ -263,7 +269,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curr_time = QTime(00, 00, 00)
         self.figure_canvas.stop()
         self.is_played = False
-        self.data_session.stop()
+        dt_params = {'start': self.start_aboving_time, 'finish': self.finish_aboving_time}
+        self.data_session.stop(dt_params)
         self.data_session = None
         self.ui.measurements_list_widget.clear()
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
@@ -282,11 +289,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(row_index, col_index),
                                                  sensor_value)
             self.current_sensor_values[sensor_number] = sensor_value
+            if self.aboving_timer.isActive() and sensor_value < 56:
+                logger.debug(f'Sensor {sensor_number} is {sensor_value} after starting 30 min timer')
+                # Rerun timer
+                self.aboving_timer.stop()
+                self.start_aboving_time = None
+
             if all([x > 56 for x in self.current_sensor_values.values()]):
                 logger.debug('All values are above 56')
                 if not self.aboving_timer.isActive():
                     self.aboving_timer.start(30 * 60 * 1000)
-                    # TODO: Save time
+                    self.start_aboving_time = datetime.datetime.now()
 
     def record_clicked(self, item):
         filename = 'data_' + item.text() + '.json'

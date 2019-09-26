@@ -70,7 +70,7 @@ class DataSession(QObject):
             self.plot_painter.add_data(parser_data)
             # TODO: save to DB
 
-    def stop(self):
+    def stop(self, additional_params):
         self.worker.stop()
         self.thread.quit()
         self.thread.wait(1000)
@@ -79,4 +79,4 @@ class DataSession(QObject):
                 + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
                 + ".json"
         )
-        self.data_parser.save_results(json_file_name)
+        self.data_parser.save_results(json_file_name, additional_params)
