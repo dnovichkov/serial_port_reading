@@ -142,13 +142,19 @@ class MainWindow(QtWidgets.QMainWindow):
         config = configparser.ConfigParser()
 
         config.read(CONFIG_FILENAME)
-        try:
-            for name, value in params.items():
-                config.set("GUI", name, str(value))
-            with open(CONFIG_FILENAME, "w") as config_file:
-                config.write(config_file)
-        except:
-            logger.warning("Error while saving GUI settings")
+        was_setting_changed = False
+        for param in params.keys():
+            if params[param] != config['GUI'][param]:
+                was_setting_changed = True
+                break
+        if was_setting_changed:
+            try:
+                for name, value in params.items():
+                    config.set("GUI", name, str(value))
+                with open(CONFIG_FILENAME, "w") as config_file:
+                    config.write(config_file)
+            except:
+                logger.warning("Error while saving GUI settings")
         super(MainWindow, self).closeEvent(event)
 
     def update_time(self):
