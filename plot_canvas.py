@@ -88,9 +88,9 @@ class MyDynamicMplCanvas(FigureCanvas):
         titles['left'] = title_1
 
         title_2 = f'Reference temperature: 56°C\n' \
-                  f'Period above ref. temp.: ???\n' \
-                  f'Beginning: {self.params.get("start", "-")}\n' \
-                  f'End: {self.params.get("finish", "-")}'
+                  f'Period above ref. temp.: \n' \
+                  f'    Beginning: {self.params.get("start", "-")}\n' \
+                  f'    End: {self.params.get("finish", "-")}\n'
         titles['center'] = title_2
         title_3 = f'Company: {self.params.get("company", "-")}\n' \
                   f'ID: {self.params.get("id", "-")}\n' \
@@ -156,15 +156,18 @@ class MyDynamicMplCanvas(FigureCanvas):
         if self.params:
             titles = self.get_titles()
             for location, title in titles.items():
-                self.fig.gca().set_title(title, loc=location, wrap=True, fontsize=10)
+                if location == 'center':
+                    self.fig.gca().set_title(title, loc=location, wrap=True, fontsize=8, horizontalalignment='left')
+                else:
+                    self.fig.gca().set_title(title, loc=location, wrap=True, fontsize=8)
             device_text = 'Measuring device: HT15\nManufacturer: DOO Draft'
-            x_coord_for_text = -8
+            x_coord_for_text = -2
             x_coord_for_person = 55
             if self.duration == 3600 * 12:
-                x_coord_for_text = -1.6
+                x_coord_for_text = -0.4
                 x_coord_for_person = 11
             if self.duration == 3600 * 24:
-                x_coord_for_text = -3.2
+                x_coord_for_text = -0.8
                 x_coord_for_person = 22
             self.axes.text(x_coord_for_text, -10, device_text,
                            {'color': 'black', 'fontsize': 9, 'ha': 'left', 'va': 'center', })
