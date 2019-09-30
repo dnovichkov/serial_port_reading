@@ -338,6 +338,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if not json_data:
             logger.warning(f'File {filename} is empty')
 
+        if self.ui.plot_graphics_view_2.scene():
+            self.ui.plot_graphics_view_2.scene().clear()
+        self.ui.plot_graphics_view_2.items().clear()
         self.archive_canvas = MyDynamicMplCanvas(width=10, height=8)
 
         self.archive_canvas.fig.subplots_adjust(left=0.05, right=0.97)
