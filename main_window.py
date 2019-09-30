@@ -139,7 +139,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage('Reading was stopped by timer')
 
     def closeEvent(self, event):
-        logger.debug("Last windows closed, exiting ...")
+        logger.info("Last windows closed, exiting ...")
         params = self.get_params()
         params.pop('duration', None)
 
@@ -318,6 +318,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.aboving_timer.isActive() and sensor_value < 56:
                 logger.info(f'Sensor {sensor_number} is {sensor_value} after starting 30 min timer, '
                              f'we will rerun timer')
+                self.statusBar().showMessage('Timer for 30 min. been stopped')
                 # Rerun timer
                 self.aboving_timer.stop()
                 self.start_aboving_time = None
@@ -327,6 +328,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if not self.aboving_timer.isActive():
                     self.aboving_timer.start(30 * 60 * 1000)
                     logger.info('Timer has been started')
+
+                    self.statusBar().showMessage('Timer for 30 min. been started')
                     self.start_aboving_time = datetime.datetime.now()
 
     def record_clicked(self, item):
