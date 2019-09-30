@@ -322,7 +322,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.aboving_timer.stop()
                 self.start_aboving_time = None
 
-            if all([x > 56 for x in self.current_sensor_values.values()]):
+            if all([x >= 56 for x in self.current_sensor_values.values()]):
                 logger.debug('All values are above 56')
                 if not self.aboving_timer.isActive():
                     self.aboving_timer.start(30 * 60 * 1000)
