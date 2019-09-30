@@ -12,3 +12,4 @@ dist/*
 plot_*.html
 data_*.json
 result_*.pdf
+data_*.pdf
