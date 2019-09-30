@@ -29,8 +29,6 @@ DEFAULT_COLOR = '#008080'
 
 
 class MyDynamicMplCanvas(FigureCanvas):
-    """A canvas that updates itself every second with a new plot."""
-
     def __init__(self, parent=None, width=6, height=5, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)

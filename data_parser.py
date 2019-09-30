@@ -15,7 +15,7 @@ class DataParser:
         Parse data from Arduino.
         Parsed data saves
         :param arduino_string: Format: 'Temperature1=56'.
-        :return: None if arduino_string and (Sensor_number, value) if everything is correct.
+        :return: None if arduino_string is wrong and (Sensor_number, value) if everything is correct.
         """
         try:
             data = arduino_string.split('=')
@@ -35,7 +35,13 @@ class DataParser:
     def get_results(self):
         """
         Return parsing results.
-        :return: Parsing results as dictionary {sensor_id: [measurement_values]}
+        :return: Parsing results as dictionary
+            {
+                points:
+                    {sensor_id: [measurement_values]},
+                params:
+                {param_name: param_value}
+            }
         """
         stop_time = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         self.params['range'] = self.start_time + ' - ' + stop_time
@@ -45,6 +51,7 @@ class DataParser:
         """
         Save results in JSON-format.
         :param json_filename:
+        :param additional_params: additional params which will be saved
         :return:
         """
         self.params.update(additional_params)

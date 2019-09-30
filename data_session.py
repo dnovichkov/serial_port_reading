@@ -13,6 +13,9 @@ DEFAULT_PORT_SETTINGS = {'SERIAL_PORT': 'COM1', 'SERIAL_RATE': 9600}
 
 
 class SerialWorker(QObject):
+    """
+    Worker for non-blocking reading data from serial port.
+    """
     read_data_signal = pyqtSignal(str)
 
     def __init__(self, port_settings):
