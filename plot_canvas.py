@@ -70,7 +70,7 @@ class MyDynamicMplCanvas(FigureCanvas):
         self.axes.clear()
         self.line_data = {}
         self.set_duration(duration)
-        self.timer.start(1000)
+        self.timer.start(3000)
 
     def stop(self):
         self.timer.stop()
@@ -107,7 +107,6 @@ class MyDynamicMplCanvas(FigureCanvas):
         minor_ticks = range(0, 101, 5)
         self.fig.gca().set_yticks(major_ticks)
         self.fig.gca().set_yticks(minor_ticks, minor=True)
-        # self.fig.gca().grid(True)
 
         if self.duration == 24 * 3600:
             self.fig.gca().set_xticks(range(0, 25, 1))
@@ -119,8 +118,6 @@ class MyDynamicMplCanvas(FigureCanvas):
             minor_x_ticks = range(0, 61, 5)
             self.fig.gca().set_xticks(major_x_ticks)
             self.fig.gca().set_xticks(minor_x_ticks, minor=True)
-
-            # self.fig.gca().set_xticks(range(0, 61, 1))
 
         self.fig.gca().grid(which='both')
         self.fig.gca().grid(which='minor', alpha=0.2)
