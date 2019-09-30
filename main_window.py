@@ -17,6 +17,10 @@ from serial_port import Ui_MainWindow
 CONFIG_FILENAME = 'settings.conf'
 
 
+def chop_microseconds(delta):
+    return delta - datetime.timedelta(microseconds=delta.microseconds)
+
+
 def get_plots_data():
     result = {}
     file_folder = os.getcwd()
@@ -111,7 +115,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.save_btn.clicked.connect(self.record_to_pdf_clicked)
         self.ui.print_btn.clicked.connect(self.handle_print)
 
-        self.curr_time = QTime(00, 00, 00)
+        self.start_reading_time = None
         self.time_update_timer = QTimer()
         self.time_update_timer.timeout.connect(self.update_time)
 
@@ -158,8 +162,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).closeEvent(event)
 
     def update_time(self):
-        self.curr_time = self.curr_time.addSecs(1)
-        self.ui.time_label.setText(self.curr_time.toString())
+        logger.debug("We added 1 sec to current time label")
+        current_time = datetime.datetime.now()
+        delta = current_time - self.start_reading_time
+        time_text = str(chop_microseconds(delta))
+        self.ui.time_label.setText(time_text)
 
     def handle_print(self):
         printer = QtPrintSupport.QPrinter(QtPrintSupport.QPrinter.HighResolution)
@@ -265,6 +272,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.figure_canvas.run(duration)
         self.is_played = True
         self.data_session = DataSession(self, self.get_params(), get_config_settings())
+        self.start_reading_time = datetime.datetime.now()
         self.time_update_timer.start(1000)
         self.stop_timer.start((duration + 1) * 1000)
         try:
@@ -276,7 +284,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def stop_reading(self):
         self.ui.record_button.setText("Start")
 
-        self.curr_time = QTime(00, 00, 00)
+        self.start_reading_time = None
         self.figure_canvas.stop()
         self.is_played = False
         dt_params = {}

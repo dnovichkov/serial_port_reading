@@ -24,18 +24,17 @@ class SerialWorker(QObject):
         logger.debug(f'Open port {port} with rate {rate}')
         try:
             self.serial_device = serial.Serial(port, rate)
+            self.serial_device.flushInput()
         except SerialException as e:
             logger.error(f'Error while reading: {e}')
 
     @pyqtSlot()
     def run(self):
         while self.is_started:
-            time.sleep(0.1)
             if self.serial_device.is_open:
                 line = self.serial_device.readline().decode('utf-8')
                 logger.debug(line)
-                data_copy = copy.deepcopy(line)
-                self.read_data_signal.emit(data_copy)
+                self.read_data_signal.emit(line)
 
         logger.debug("We finished reading")
 
