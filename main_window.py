@@ -381,3 +381,27 @@ class MainWindow(QtWidgets.QMainWindow):
             filename = 'data_' + text + '.json'
             logger.debug(f'We are going to delete {filename}')
             os.remove(filename)
+        current_items = self.ui.measurements_list_widget.selectedItems()
+        for item in current_items:
+            text = item.text()
+            filename = 'data_' + text + '.json'
+            logger.debug(f'Selected item is {text}')
+            json_data = {}
+            with open(filename, encoding='utf-8') as f:
+                data = f.read()
+                json_data = json.loads(data)
+            if not json_data:
+                logger.warning(f'File {filename} is empty')
+
+            self.archive_canvas = MyDynamicMplCanvas(width=10, height=8)
+
+            self.archive_canvas.fig.subplots_adjust(left=0.05, right=0.97)
+            self.archive_canvas.line_data = json_data.get('points')
+            self.archive_canvas.duration = json_data.get('params', {}).get('duration', 0)
+            self.archive_canvas.params = json_data.get('params')
+            scene = QtWidgets.QGraphicsScene()
+            self.ui.plot_graphics_view_2.setScene(scene)
+            self.archive_canvas.update_figure()
+
+            scene.addWidget(self.archive_canvas)
+            break
