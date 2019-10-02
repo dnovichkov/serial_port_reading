@@ -44,7 +44,7 @@ class DataParser:
             }
         """
 
-        stop_time = datetime.datetime.now().replace(second=self.start_time.second).strftime("%d.%m.%Y %H:%M:%S")
+        stop_time = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         self.params['range'] = self.start_time + ' - ' + stop_time
         return {'points': self.parsing_results, 'params': self.params}
 
