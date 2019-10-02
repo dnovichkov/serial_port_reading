@@ -44,7 +44,7 @@ Temperature3=53
 ```
 If you want to change design, you should use serial_port.ui file. It can be opened by QtDesigner.
 
-After changing and saving this file you shoul run
+After changing and saving this file you should run
 ```
 pyuic5 serial_port.ui -o serial_port.py
 ```
