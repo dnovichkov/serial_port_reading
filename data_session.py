@@ -43,6 +43,7 @@ class SerialWorker(QObject):
 
     def stop(self):
         self.is_started = False
+        time.sleep(1)
         self.serial_device.close()
 
 
