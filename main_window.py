@@ -130,13 +130,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.aboving_timer.timeout.connect(self.aboving_timer_signal)
         self.start_aboving_time = None
         self.finish_aboving_time = None
+        self.was_timer_reached = False
 
     def aboving_timer_signal(self):
-        logger.info("Above-timer was stopped by timeout")
-        self.finish_aboving_time = datetime.datetime.now()
-        self.stop_reading()
+        self.was_timer_reached = True
 
-        self.statusBar().showMessage('Reading was stopped by timer')
+        self.finish_aboving_time = datetime.datetime.now().replace(second=self.start_aboving_time.second)
+        logger.info(f"Timer for 30 min has been stopped at {self.finish_aboving_time.strftime('%d.%m.%Y %H:%M:%S')}")
+        self.statusBar().showMessage(f"Timer for 30 min has been stopped at "
+                                     f"{self.finish_aboving_time.strftime('%d.%m.%Y %H:%M:%S')}")
 
     def closeEvent(self, event):
         logger.info("Last windows closed, exiting ...")
@@ -282,11 +284,7 @@ class MainWindow(QtWidgets.QMainWindow):
             logger.error(f'Error while reading data: {e}')
 
     def stop_reading(self):
-        self.ui.record_button.setText("Start")
-
-        self.start_reading_time = None
-        self.figure_canvas.stop()
-        self.is_played = False
+        self.was_timer_reached = False
         dt_params = {}
         if self.start_aboving_time:
             dt_params['start'] = self.start_aboving_time.strftime("%d.%m.%Y %H:%M:%S")
@@ -294,6 +292,12 @@ class MainWindow(QtWidgets.QMainWindow):
             dt_params['finish'] = self.finish_aboving_time.strftime("%d.%m.%Y %H:%M:%S")
 
         self.data_session.stop(dt_params)
+
+        self.ui.record_button.setText("Start")
+
+        self.start_reading_time = None
+        self.figure_canvas.stop()
+        self.is_played = False
         self.data_session = None
         self.ui.measurements_list_widget.clear()
         self.ui.measurements_list_widget.addItems(get_plots_data().keys())
@@ -318,19 +322,20 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.aboving_timer.isActive() and sensor_value < 56:
                 logger.info(f'Sensor {sensor_number} is {sensor_value} after starting 30 min timer, '
                              f'we will rerun timer')
-                self.statusBar().showMessage('Timer for 30 min. been stopped')
+                self.statusBar().showMessage('Timer for 30 min. has not been started')
                 # Rerun timer
                 self.aboving_timer.stop()
                 self.start_aboving_time = None
 
             if all([x >= 56 for x in self.current_sensor_values.values()]):
                 logger.debug('All values are above 56')
-                if not self.aboving_timer.isActive():
+                if not self.aboving_timer.isActive() and not self.was_timer_reached:
                     self.aboving_timer.start(30 * 60 * 1000)
                     logger.info('Timer has been started')
 
-                    self.statusBar().showMessage('Timer for 30 min. been started')
                     self.start_aboving_time = datetime.datetime.now()
+                    self.statusBar().showMessage(f"Timer for 30 min. been started at "
+                                                 f"{self.start_aboving_time.strftime('%d.%m.%Y %H:%M:%S')}")
 
     def record_clicked(self, item):
         filename = 'data_' + item.text() + '.json'
