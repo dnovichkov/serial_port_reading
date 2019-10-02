@@ -316,8 +316,9 @@ class MainWindow(QtWidgets.QMainWindow):
             sensor_correct = sensor_number - 1
             col_index = 2 * (sensor_correct // 4) + 1
             row_index = sensor_correct % 4
+            table_text = str(sensor_value) + '°C'
             self.sensor_data_table_model.setData(self.sensor_data_table_model.index(row_index, col_index),
-                                                 sensor_value)
+                                                 table_text)
             self.current_sensor_values[sensor_number] = sensor_value
             if self.aboving_timer.isActive() and sensor_value < 56:
                 logger.info(f'Sensor {sensor_number} is {sensor_value} after starting 30 min timer, '
