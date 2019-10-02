@@ -101,6 +101,8 @@ class MyDynamicMplCanvas(FigureCanvas):
 
     def update_figure(self):
         self.axes.clear()
+        self.fig.legends.clear()
+
         self.fig.gca().set_ylim([0, 101])
 
         major_ticks = range(0, 101, 10)
@@ -147,7 +149,7 @@ class MyDynamicMplCanvas(FigureCanvas):
                 x_coords = [x / 3600 for x in range(plot_count)]
             self.axes.plot(x_coords, points, color, label=name)
 
-        self.fig.legend(loc='lower center', shadow=False, ncol=5, framealpha=0.4, handlelength=1)
+        self.fig.legend(loc='lower center', shadow=False, ncol=5, framealpha=0, handlelength=1, borderaxespad=0)
         if self.params:
             titles = self.get_titles()
             for location, title in titles.items():
